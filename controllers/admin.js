@@ -131,6 +131,132 @@ const deleteGroupMaster = async (req, res) => {
 
 //#endregion
 
+//#region  Alarm Type Master  
+const getAlarmTypeMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.alarmTypeMaster, req.query.id);
+
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Alarm Type master data');
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getAlarmTypeMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.id) {
+            return getAlarmTypeMasterById(req, res);
+        }
+        else {
+            await dal.getList({ model: db.alarmTypeMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting AlarmType details');
+    }
+};
+
+const getLastAlarmTypeOrder = async (isActive) => {
+    try {
+        const alarmTypeMaster = await db.alarmTypeMaster.findOne({
+            order: [['`alarmTypeOrder`', 'desc']],
+            limit: 1,
+            where: {
+                is_active: 1
+            },
+            attributes: ['alarmTypeOrder']
+        });
+
+        return alarmTypeMaster;
+    }
+    catch (error) {
+        return undefined;
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+*/
+
+const _FindAlarmTypeMasterAlreadyExistOrNot = async (id, Code) => {
+    let where = [];
+    if (id && id !== null && id !== 'undefined') {
+        where.push(util.constructWheresForNotEqualSequelize('id', id));
+    }
+    where.push(util.constructWheresForSequelize('isActive', 1));
+    where.push(util.constructWheresForSequelize('alarmTypeCode', Code));
+
+    const alarmTypeMasterDetails = await dal.getList({ model: db.alarmTypeMaster, where, order: [['createdAt', 'desc']], include: false, });
+    if (alarmTypeMasterDetails && alarmTypeMasterDetails.length > 0) {
+        return 'already exist'
+    }
+    else {
+        return 'success'
+    }
+}
+
+const saveAlarmTypeMaster = async (req, res) => {
+    try {
+        const alarmTypeMaster = req.body;
+
+       
+        console.log("Alarm Type Master : ",alarmTypeMaster);
+        const PKID = alarmTypeMaster && alarmTypeMaster.id ? alarmTypeMaster.id : undefined;
+        const ChekAlreadyExist = await _FindAlarmTypeMasterAlreadyExistOrNot(PKID, alarmTypeMaster.alarmTypeCode);
+        let CodeMsg = alarmTypeMaster && alarmTypeMaster.alarmTypeCode ? 'Alarm Type  "' + alarmTypeMaster.alarmTypeCode + '" already in use' : 'Alarm Type code already in use';
+        if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
+
+        let lastOrder = 0;
+        if (alarmTypeMaster.alarmTypeOrder == null) {
+            lastOrder = await getLastAlarmTypeOrder(true);
+            if (lastOrder && lastOrder.alarmTypeOrder)
+            alarmTypeMaster.alarmTypeOrder = lastOrder.alarmTypeOrder + 1;
+            else
+            alarmTypeMaster.alarmTypeOrder = 1;
+        }
+    console.log("req : ", req.user);
+       if(req.user && req.user.id !==null)
+       UserId = req.user.id;
+       //-----let primaryKey = 'alarm_type_id';
+        if (util.missingRequiredFields('alarmTypeMaster', alarmTypeMaster, res) === '') {
+           //----- await dal.saveData(db.alarmTypeMaster, alarmTypeMaster, res, UserId, undefined, undefined, undefined, primaryKey);
+            await dal.saveData(db.alarmTypeMaster, alarmTypeMaster, res, UserId);
+        }
+        else {
+            console.log("Backend Alarm Type master Data else condition", req)
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving Alarm Type master details');
+    }
+};
+
+const deleteAlarmTypeMaster = async (req, res) => {
+    try {
+        if(req.user && req.user.id !==null)
+         UserId = req.user.id;
+        if (!req.query.id) {
+            throw util.generateWarning(`Please provide Alarm Type master id`, codes.ID_NOT_FOUND);
+        }
+        dal.deleteRecords(db.alarmTypeMaster, req.query.id, UserId, res);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting Alarm Type master details');
+    }
+};
+
+//#endregion
+
 //#region  Org Relation Type Master
 const getOrgRelationTypeMasterById = async (req, res) => {
     try {
@@ -1193,6 +1319,10 @@ module.exports.getOrgRelationTypeMaster = getOrgRelationTypeMaster;
 module.exports.saveGroupMaster = saveGroupMaster;
 module.exports.deleteOrgRelationTypeMaster = deleteOrgRelationTypeMaster;
 module.exports.getGroupMaster = getGroupMaster;
+
+module.exports.saveAlarmTypeMaster = saveAlarmTypeMaster;
+module.exports.deleteAlarmTypeMaster = deleteAlarmTypeMaster;
+module.exports.getAlarmTypeMaster = getAlarmTypeMaster;
 
 module.exports.saveModuleMaster = saveModuleMaster;
 module.exports.deleteModuleMaster = deleteModuleMaster;
