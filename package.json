@@ -1,0 +1,32 @@
+{
+  "name": "-y",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "http-errors": "^1.8.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.2.5",
+    "nodemon": "^2.0.6",
+    "pug": "^3.0.0",
+    "sequelize": "^5.22.3",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "forever start ./bin/www",
+    "start-auth-dev": "DEBUG=api:server nodemon --prof ./bin/www",
+    "start-staging-auth": "DEBUG=api:server forever start ./bin/www",
+    "api-doc": "apidoc -i ./controllers/ -o ../apidoc/"
+  },
+  "author": "",
+  "license": "ISC"
+}
