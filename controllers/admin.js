@@ -45,7 +45,7 @@ const getLastGroupOrder = async (isActive) => {
             order: [['`groupOrder`', 'desc']],
             limit: 1,
             where: {
-                is_active: 1
+                isActive: 1
             },
             attributes: ['groupOrder']
         });
@@ -157,7 +157,9 @@ const getOrgRelationTypeMaster = async (req, res) => {
             return getOrgRelationTypeMasterById(req, res);
         }
         else {
-            await dal.getList({ model: db.orgRelationTypeMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+            console.log("before getlist : ", where)
+           const Result = await dal.getList({ model: db.orgRelationTypeMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+           console.log("after getlist : ", Result)
         }
     }
     catch (error) {
@@ -1187,11 +1189,11 @@ const getStatusMaster = async (req, res) => {
 
 
 module.exports.saveorgRelationTypeMaster = saveorgRelationTypeMaster;
-module.exports.deleteGroupMaster = deleteGroupMaster;
+module.exports.deleteOrgRelationTypeMaster = deleteOrgRelationTypeMaster;
 module.exports.getOrgRelationTypeMaster = getOrgRelationTypeMaster;
 
 module.exports.saveGroupMaster = saveGroupMaster;
-module.exports.deleteOrgRelationTypeMaster = deleteOrgRelationTypeMaster;
+module.exports.deleteGroupMaster = deleteGroupMaster;
 module.exports.getGroupMaster = getGroupMaster;
 
 module.exports.saveModuleMaster = saveModuleMaster;

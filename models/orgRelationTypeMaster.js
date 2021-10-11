@@ -1,5 +1,5 @@
 module.exports = function (sequelize, DataTypes) {
-    const module = sequelize.define('orgRelationTypeMaster', {
+    const orgRelationTypeMaster = sequelize.define('orgRelationTypeMaster', {
         id: {
             type: DataTypes.STRING,
             primaryKey: true,
@@ -43,5 +43,5 @@ module.exports = function (sequelize, DataTypes) {
             }
         });
 
-    return module;
+    return orgRelationTypeMaster;
 };

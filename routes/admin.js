@@ -5,6 +5,11 @@ const admin = require('../controllers/admin');
 
 //console.log("Route",admin)
 
+router.get('/orgRelationTypeMaster', (req, res) => admin.getOrgRelationTypeMaster(req, res));
+router.put('/orgRelationTypeMaster', (req, res) => admin.saveorgRelationTypeMaster(req, res));
+router.post('/orgRelationTypeMaster', (req, res) => admin.saveorgRelationTypeMaster(req, res));
+router.delete('/orgRelationTypeMaster', (req, res) => admin.deleteOrgRelationTypeMaster(req, res));
+
 router.get('/groupMaster', (req, res) => admin.getGroupMaster(req, res));
 router.put('/groupMaster', (req, res) => admin.saveGroupMaster(req, res));
 router.post('/groupMaster', (req, res) => admin.saveGroupMaster(req, res));
