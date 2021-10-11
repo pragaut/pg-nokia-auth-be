@@ -227,7 +227,7 @@ const entry = async (req, res, next) => {
 
                     //console.log("10");
                     const _user = await user._findUserWithId(decoded.userId);
-                    console.log("11");
+                    console.log("11",_user);
                     if (!_user) {
                         console.log("12");
                         // cannot find user. Must have been deleted or a wrong user id. Ouch Ouch Ouch

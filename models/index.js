@@ -53,6 +53,7 @@ db.roleMaster.hasOne(db.userRole , { as: 'userRoles', foreignKey: 'roleId' });
 db.yearMaster.belongsTo(db.yearTypeMaster , { as: 'yearType', foreignKey: 'yearTypeMasterId' });
 db.companyMaster.belongsTo(db.yearTypeMaster,{as :'yearType',foreignKey:'yearTypeMasterId'});
 db.user.belongsTo(db.employeeMaster,{as :'employeeMaster',foreignKey:'employeeId'});
+db.orgRelationTypeMaster.belongsTo(db.groupMaster,{as :'group',foreignKey:'groupId'});
 // db.module.belongsTo(db.roleMaster);
 // db.roleMaster.hasMany(db.module)
 

@@ -44,7 +44,7 @@ const _authenticate = async (email, password, requestSource, socialauth, ipAddre
 	}, {
 		model: db.accessGroup, as: 'accessGroup',
 		where: {
-		     active: 1,
+			active: 1,
 		},
 		required: false,
 	}, {
@@ -55,7 +55,7 @@ const _authenticate = async (email, password, requestSource, socialauth, ipAddre
 		required: false,
 	}];
 	console.log("auth include : ", include);
-	const user = await dal.findOne(db.user, where, true, include, 2, ['user','userRoles', 'roleMaster', 'accessGroup','employeeMaster']);
+	const user = await dal.findOne(db.user, where, true, include, 2, ['user', 'userRoles', 'roleMaster', 'accessGroup', 'employeeMaster']);
 	console.log("user : 1 ", user);
 
 	if (!user) {
@@ -73,7 +73,7 @@ const _authenticate = async (email, password, requestSource, socialauth, ipAddre
 	else {
 		// validate password
 		const passwordIsValid = encryptionHelper.validatePassword(password, user.password, user.saltPassword);
-        console.log("password Is Valid : ",passwordIsValid);
+		console.log("password Is Valid : ", passwordIsValid);
 		if (!passwordIsValid) {
 			// couldn't authenticate the password
 			await saveUnSuccessfullCountAndLockDetails(user);
@@ -95,7 +95,7 @@ const _authenticate = async (email, password, requestSource, socialauth, ipAddre
 				dal.saveData(db.user, userData);
 
 				requestType = 'password-reset';
-				const emailResult = await emailService.sendEmailWithTemplate(undefined, `${requestType}`, { name: `${user.employeeMaster.employeeName}` , password: password }, user.email, 'Password delivered successfully');
+				const emailResult = await emailService.sendEmailWithTemplate(undefined, `${requestType}`, { name: `${user.employeeMaster.employeeName}`, password: password }, user.email, 'Password delivered successfully');
 				//console.log("emailResult", emailResult);
 
 				const error = util.generateWarning(messages.PASSWORD_RESET);
@@ -406,7 +406,45 @@ const _findVerifiedUserWithEmail = async (emailToSearch, isActive) => {
 	return user;
 };
 
-const _findUserWithId = async id => await dal.findById(db.user, id, true);
+const _findUserWithId = async (id) => { 
+	// await dal.findById(db.user, id, false); 
+	const where = {
+		//[Op.or]: [{ username: email }],
+		id: id,
+		isActive: 1
+	};
+	console.log("auth where : ", where);
+	const include = [{
+		model: db.userRole, as: 'userRoles',
+		where: {
+			isActive: 1
+		},
+		required: true,
+		include: [{
+			model: db.roleMaster, as: 'roleMaster',
+			where: {
+				isActive: 1,
+			},
+			required: false,
+		}]
+	}, {
+		model: db.accessGroup, as: 'accessGroup',
+		where: {
+			active: 1,
+		},
+		required: false,
+	}, {
+		model: db.employeeMaster, as: 'employeeMaster',
+		where: {
+			isActive: 1,
+		},
+		required: false,
+	}];
+	console.log("auth include : ", include);
+	const Result = await dal.findOne(db.user, where, true, include, 2, ['user', 'userRoles', 'roleMaster', 'accessGroup', 'employeeMaster']);
+	console.log("auth include Result: ", Result);
+	return Result; 
+};
 
 const _getUsersByEmail = async (nameToSearch) => {
 	const users = await db.user.findAndCountAll({
@@ -983,7 +1021,7 @@ const authenticate = async (req, res) => {
 			console.log("----------------------------login -------------------------------------");
 			if (util.missingRequiredFields('login', req.body, res) === '') user = await _authenticate(req.body.email, req.body.password, req.HostName, req.body.socialauth, req.body.dataPublicIP);
 		}
-	console.log('recevied from social: ', user);	
+		console.log('recevied from social: ', user);
 
 		// const userData = {
 		// 	id: user.id,
@@ -994,7 +1032,7 @@ const authenticate = async (req, res) => {
 
 		// authenticated successfully. Now let's store a refresh token. First, let's create a token
 		const refreshToken = encryptionHelper.randomBytes(40, 'base64');
-    
+
 		const dataToSave = {
 			refreshToken,
 			email: user.employeeMaster.email,
@@ -1028,7 +1066,7 @@ const authenticate = async (req, res) => {
 		requestType = constants.TEMPLATES.TYPES.LOGIN_SUCCESS.EMAIL;
 		const emailResult = await emailService.sendEmailWithTemplate(undefined, `${requestType}`, { name: `${user.firstName}` + " " + `${user.lastName}`, password: req.body.password }, user.email, 'Password delivered successfully');
 		console.log("user data : ", user);
-         
+
 		const authPacket = {
 			token: authToken,
 			refreshToken,
@@ -1038,12 +1076,12 @@ const authenticate = async (req, res) => {
 				employeeName: user.employeeMaster.employeeName,
 				email: user.employeeMaster.email,
 				mobile: user.employeeMaster.mobile,
-				userRoles:user.userRoles
+				userRoles: user.userRoles
 			},
 		};
 
-		console.log('auth package: ', user.password); 
-		
+		console.log('auth package: ', user.password);
+
 		responseHelper.success(res, 200, authPacket, messages.LOGGED_IN_SUCCESSFULLY);
 	}
 	catch (error) {
@@ -1394,11 +1432,11 @@ const forgotPassword = async (req, res) => {
 			const code = util.generateRandomCode(config.OTP_LENGTH);
 
 			if (user.email) {
-				await otp._generateAndSendOTP(undefined, user.id, user.email, 'email', constants.OTP.REQUEST_TYPES.FORGOT_PASSWORD, code,userName);
+				await otp._generateAndSendOTP(undefined, user.id, user.email, 'email', constants.OTP.REQUEST_TYPES.FORGOT_PASSWORD, code, userName);
 			}
 
 			if (user.mobile) {
-				await otp._generateAndSendOTP(undefined, user.id, user.mobile, 'mobile', constants.OTP.REQUEST_TYPES.FORGOT_PASSWORD, code,userName);
+				await otp._generateAndSendOTP(undefined, user.id, user.mobile, 'mobile', constants.OTP.REQUEST_TYPES.FORGOT_PASSWORD, code, userName);
 			}
 
 			// if it comes here, it means the otp has been delivered. Otherwise the error will come and the control
