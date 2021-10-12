@@ -27,7 +27,7 @@ const _authenticate = async (email, password, requestSource, socialauth, ipAddre
 		[Op.or]: [{ username: email }],
 		is_active: 1
 	};
-	console.log("auth where : ", where);
+	//console.log("auth where : ", where);
 	const include = [{
 		model: db.userRole, as: 'userRoles',
 		where: {
@@ -54,9 +54,9 @@ const _authenticate = async (email, password, requestSource, socialauth, ipAddre
 		},
 		required: false,
 	}];
-	console.log("auth include : ", include);
+	//console.log("auth include : ", include);
 	const user = await dal.findOne(db.user, where, true, include, 2, ['user', 'userRoles', 'roleMaster', 'accessGroup', 'employeeMaster']);
-	console.log("user : 1 ", user);
+	//console.log("user : 1 ", user);
 
 	if (!user) {
 		const error = util.generateWarning(messages.INVALID_CREDENTIALS);
@@ -73,7 +73,7 @@ const _authenticate = async (email, password, requestSource, socialauth, ipAddre
 	else {
 		// validate password
 		const passwordIsValid = encryptionHelper.validatePassword(password, user.password, user.saltPassword);
-		console.log("password Is Valid : ", passwordIsValid);
+		//console.log("password Is Valid : ", passwordIsValid);
 		if (!passwordIsValid) {
 			// couldn't authenticate the password
 			await saveUnSuccessfullCountAndLockDetails(user);
@@ -189,7 +189,7 @@ const saveAuthLogs = async (userName, password, ipAddress, userId, isInvalidUser
 		return true;
 	}
 	catch (error) {
-		console.log("error auth log : ", error);
+		//console.log("error auth log : ", error);
 		return true;
 	}
 }
@@ -211,7 +211,7 @@ const _authenticate_OTP = async (userOptions, requestSource, socialauth) => {
 		where.mobile = userName;
 	}
 
-	console.log("where", where);
+	//console.log("where", where);
 	const user = await dal.findOne(db.user, where, true);
 
 	if (!user) {
@@ -265,7 +265,7 @@ const _authenticate_OTP = async (userOptions, requestSource, socialauth) => {
  */
 
 const _authenticate_social = async (userOptions, requestSource) => {
-	console.log('atleast here: ', userOptions);
+	//console.log('atleast here: ', userOptions);
 	const {
 		token, email, facebookUserId, authType, source, referredByCode
 	} = userOptions;
@@ -280,7 +280,7 @@ const _authenticate_social = async (userOptions, requestSource) => {
 	}
 
 
-	console.log('t1');
+	//console.log('t1');
 
 	// if we have come here, it means we have got the user object
 
@@ -288,7 +288,7 @@ const _authenticate_social = async (userOptions, requestSource) => {
 
 	let _user = await _findUserWithEmail(email);
 
-	console.log('t2');
+	//console.log('t2');
 
 	/** two cases here
 	 * 1. If the user is new, and the request is for CRM, cannot proceed. 
@@ -322,7 +322,7 @@ const _authenticate_social = async (userOptions, requestSource) => {
 			authType: "social",
 		};
 
-		console.log('userwa / sourcewa: ', source);
+		//console.log('userwa / sourcewa: ', source);
 
 		// let's update the rewards points, if available
 		newUser.rewardPoints = 0;
@@ -342,7 +342,7 @@ const _authenticate_social = async (userOptions, requestSource) => {
 		_user = await dal.saveData(db.user, newUser);
 	}
 
-	console.log('came here: ', _user);
+	//console.log('came here: ', _user);
 
 	return _user;
 };
@@ -413,7 +413,7 @@ const _findUserWithId = async (id) => {
 		id: id,
 		isActive: 1
 	};
-	console.log("auth where : ", where);
+	//console.log("auth where : ", where);
 	const include = [{
 		model: db.userRole, as: 'userRoles',
 		where: {
@@ -440,9 +440,9 @@ const _findUserWithId = async (id) => {
 		},
 		required: false,
 	}];
-	console.log("auth include : ", include);
+	//console.log("auth include : ", include);
 	const Result = await dal.findOne(db.user, where, true, include, 2, ['user', 'userRoles', 'roleMaster', 'accessGroup', 'employeeMaster']);
-	console.log("auth include Result: ", Result);
+	//console.log("auth include Result: ", Result);
 	return Result; 
 };
 
@@ -1018,10 +1018,10 @@ const authenticate = async (req, res) => {
 		}
 		else {
 			// required fields check
-			console.log("----------------------------login -------------------------------------");
+		//	console.log("----------------------------login -------------------------------------");
 			if (util.missingRequiredFields('login', req.body, res) === '') user = await _authenticate(req.body.email, req.body.password, req.HostName, req.body.socialauth, req.body.dataPublicIP);
 		}
-		console.log('recevied from social: ', user);
+		//('recevied from social: ', user);
 
 		// const userData = {
 		// 	id: user.id,
@@ -1065,7 +1065,7 @@ const authenticate = async (req, res) => {
 
 		requestType = constants.TEMPLATES.TYPES.LOGIN_SUCCESS.EMAIL;
 		const emailResult = await emailService.sendEmailWithTemplate(undefined, `${requestType}`, { name: `${user.firstName}` + " " + `${user.lastName}`, password: req.body.password }, user.email, 'Password delivered successfully');
-		console.log("user data : ", user);
+		//console.log("user data : ", user);
 
 		const authPacket = {
 			token: authToken,
@@ -1080,12 +1080,12 @@ const authenticate = async (req, res) => {
 			},
 		};
 
-		console.log('auth package: ', user.password);
+		//console.log('auth package: ', user.password);
 
 		responseHelper.success(res, 200, authPacket, messages.LOGGED_IN_SUCCESSFULLY);
 	}
 	catch (error) {
-		console.log('error: ', error);
+	//	console.log('error: ', error);
 		responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'Authentication Error');
 	}
 };
@@ -1220,7 +1220,7 @@ const registerLogin = async (req, res) => {
 			//console.log("mobile otp");
 			await otp._generateAndSendOTP(null, user.id, user.mobile, 'mobile', constants.OTP.REQUEST_TYPES.REGISTRATION, code, "User");
 		}
-		console.log("register Login success");
+		//console.log("register Login success");
 		// coming here means that the user has been registered successfully.
 		responseHelper.success(res, 200, { id: user.id, email: user.email }, messages.REGISTERED_SUCCESSFULLY);
 
@@ -1252,21 +1252,21 @@ const updateProfile = async (req, res) => {
 		};
 
 
-		console.log('test: ', user);
+		//console.log('test: ', user);
 
 		// take the cart from temp to the user synchronously
 		if (body.tempUserId) {
 			db.sequelize.query('call shift_cart_to_user(:temp_user_id, :user_id)', { replacements: { temp_user_id: body.tempUserId, user_id: user.id } }).then(results => {
-				console.log('cart shifted successfully');
+				//console.log('cart shifted successfully');
 			}).catch(err => {
-				console.log('error hai: ', err);
+				//console.log('error hai: ', err);
 			});
 		}
 
 
 		const vendor = user.vendor;
 
-		console.log('vendor: ', vendor);
+		//console.log('vendor: ', vendor);
 
 		await db.token.create(dataToSave);
 
@@ -1325,7 +1325,7 @@ const updateProfile = async (req, res) => {
 			},
 		};
 
-		console.log('auth package: ', user.password);
+		//console.log('auth package: ', user.password);
 		responseHelper.success(res, 200, authPacket, messages.LOGGED_IN_SUCCESSFULLY);
 
 		// coming here means that the user has been registered successfully.
@@ -1353,7 +1353,7 @@ const resendOTP = async (req, res) => {
 		// coming here means that the user has been registered successfully.
 		responseHelper.success(res, 200, { id: req.body.userId, userName: req.body.userName }, "OTP re-sent successfully");
 	} catch (error) {
-		console.log("15");
+		//("15");
 		responseHelper.error(res, error, error.code ? error.code : 502, 'Resend OTP');
 	}
 };
@@ -1696,13 +1696,13 @@ const saveUser = async (req, res) => {
 			}];
 			//wheres.push(util.constructWheresForSequelize('active', 1));
 			//wheres.push(util.constructWheresForSequelize('email', userq.email));
-			console.log("save user 6w ", wheres)
+			//console.log("save user 6w ", wheres)
 			const _userWithEmail = await dal.findOne(db.user,
 				wheres,
 				true,
 				include
 			);
-			console.log("save user 6 ", _userWithEmail)
+			//console.log("save user 6 ", _userWithEmail)
 			if (_userWithEmail) {
 				// return responseHelper.success(res, codes.EMAIL_ALREADY_EXISTS, {
 				// 	id: _userWithEmail.id
@@ -1727,7 +1727,7 @@ const saveUser = async (req, res) => {
 			//console.log("save user 7 ")
 		}
 
-		console.log('saving: ');
+		//console.log('saving: ');
 
 		user.originPlatform = user.source;
 		user.active = true;
@@ -1768,7 +1768,7 @@ const saveUser = async (req, res) => {
 		}
 		responseHelper.success(res, codes.SUCCESS, userSaveResult.id, messages.USER_SAVED, userSaveResult.id, 1);
 	} catch (error) {
-		console.log("save user error ")
+	//	console.log("save user error ")
 		responseHelper.error(res, error, error.code, 'Updating user error !!');
 	}
 };
@@ -1788,7 +1788,7 @@ const getUserRoleByUserAndRoleId = async (userId, Roles, createdBy) => {
 		return userRoleResult;
 	} catch (error) {
 		//responseHelper.error(undefined, error, error.code, 'Updating User role');
-		console.log("user role log error : ", error);
+		//("user role log error : ", error);
 		return undefined
 	}
 }
@@ -1807,7 +1807,7 @@ const getUserRoleByUserId = async (userId) => {
 		return userRoleResult;
 	} catch (error) {
 		//responseHelper.error(undefined, error, error.code, 'Updating User role');
-		console.log("user role log error : ", error);
+		//console.log("user role log error : ", error);
 		return undefined
 	}
 }
@@ -1865,7 +1865,7 @@ const saveUserRoles = async (userId, Role, Roles, createdBy) => {
 		return userRoleResult;
 	} catch (error) {
 		//responseHelper.error(undefined, error, error.code, 'Updating User role');
-		console.log("user role log error : ", error);
+		//console.log("user role log error : ", error);
 		return undefined
 	}
 }
@@ -1893,7 +1893,7 @@ const unLockAccount = async (req, res) => {
 
 	try {
 
-		console.log("api req 1 - body ", req.body);
+		//console.log("api req 1 - body ", req.body);
 
 		const user = await _findUserWithId(req.body.id);
 		const passwordSaltWrapper = encryptionHelper.hashPassword(req.body.password);
@@ -1910,11 +1910,11 @@ const unLockAccount = async (req, res) => {
 		dal.saveData(db.user, userData);
 		requestType = 'account-unlocked';
 		const emailResult = await emailService.sendEmailWithTemplate(undefined, `${requestType}`, { name: `${req.body.firstName}` + " " + `${req.body.lastName}`, password: req.body.password }, req.body.email, 'Password delivered successfully');
-		console.log('auth package: ', user.password);
+		//console.log('auth package: ', user.password);
 		responseHelper.success(res, 200, {}, 'Account unlocked successfully');
 	}
 	catch (error) {
-		console.log('error: ', error);
+		//console.log('error: ', error);
 		responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'Authentication Error');
 	}
 };
@@ -2157,7 +2157,7 @@ const getUsers = async (req, res) => {
 
 const getUsersP = async (req, res) => {
 	try {
-		console.log("Get getUsersP req.query : ", req.query);
+		//console.log("Get getUsersP req.query : ", req.query);
 		db.sequelize.query('call Asp_UserDetails_Get_UserDetails(:userId, :companyMasterId, :plantMasterId, :departmentMasterId, :roleMasterId)', {
 			replacements: {
 				userId: req.query.userId ? req.query.userId : '',
@@ -2199,7 +2199,7 @@ const registerDevice = async (req, res) => {
 const isDeviceRegistered = async (req, res) => {
 	try {
 
-		console.log('requi: ', req.user.id);
+		//console.log('requi: ', req.user.id);
 
 		const user = await dal.findOne(db.user, {
 			id: req.user.id,

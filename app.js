@@ -47,7 +47,7 @@ app.use('/static', express.static('static'));
 // routing goes here for the middleware
 app.use('/api-auth/*/', (req, res, next) => {
 	// send it to middleware
-console.log("Auth api request(app.js - before middleware) req ", req.url, req.headers)
+//console.log("Auth api request(app.js - before middleware) req ", req.url, req.headers)
 	util.assignHostNameToReq(req);
 
 	middleware.entry(req, res, result => {

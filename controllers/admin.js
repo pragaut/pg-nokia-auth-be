@@ -38,7 +38,6 @@ const getGroupMaster = async (req, res) => {
         responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting groups details');
     }
 };
-
 const getLastGroupOrder = async (isActive) => {
     try {
         const groupMaster = await db.groupMaster.findOne({
@@ -77,14 +76,13 @@ const _FindGroupMasterAlreadyExistOrNot = async (id, Code) => {
     else {
         return 'success'
     }
-}
-
+};
 const saveGroupMaster = async (req, res) => {
     try {
         const groupMaster = req.body;
 
-       
-        console.log("Group Master : ",groupMaster);
+
+        console.log("Group Master : ", groupMaster);
         const PKID = groupMaster && groupMaster.id ? groupMaster.id : undefined;
         const ChekAlreadyExist = await _FindGroupMasterAlreadyExistOrNot(PKID, groupMaster.groupCode);
         let CodeMsg = groupMaster && groupMaster.groupCode ? 'Group  "' + groupMaster.groupCode + '" already in use' : 'Group code already in use';
@@ -98,12 +96,12 @@ const saveGroupMaster = async (req, res) => {
             else
                 groupMaster.groupOrder = 1;
         }
-    console.log("req : ", req.user);
-       if(req.user && req.user.id !==null)
-       UserId = req.user.id;
-       //-----let primaryKey = 'group_id';
+        console.log("req : ", req.user);
+        if (req.user && req.user.id !== null)
+            UserId = req.user.id;
+        //-----let primaryKey = 'group_id';
         if (util.missingRequiredFields('groupMaster', groupMaster, res) === '') {
-           //----- await dal.saveData(db.groupMaster, groupMaster, res, UserId, undefined, undefined, undefined, primaryKey);
+            //----- await dal.saveData(db.groupMaster, groupMaster, res, UserId, undefined, undefined, undefined, primaryKey);
             await dal.saveData(db.groupMaster, groupMaster, res, UserId);
         }
         else {
@@ -114,11 +112,10 @@ const saveGroupMaster = async (req, res) => {
         responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving group master details');
     }
 };
-
 const deleteGroupMaster = async (req, res) => {
     try {
-        if(req.user && req.user.id !==null)
-         UserId = req.user.id;
+        if (req.user && req.user.id !== null)
+            UserId = req.user.id;
         if (!req.query.id) {
             throw util.generateWarning(`Please provide group master id`, codes.ID_NOT_FOUND);
         }
@@ -158,8 +155,8 @@ const getOrgRelationTypeMaster = async (req, res) => {
         }
         else {
             console.log("before getlist : ", where)
-           const Result = await dal.getList({ model: db.orgRelationTypeMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
-           console.log("after getlist : ", Result)
+            const Result = await dal.getList({ model: db.orgRelationTypeMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+            console.log("after getlist : ", Result)
         }
     }
     catch (error) {
@@ -172,7 +169,7 @@ const getOrgRelationTypeMaster = async (req, res) => {
 * @param {*} res 
 */
 
-const _FindorgRelationTypeAlreadyExistOrNot = async (id,groupId, orgRelationType) => {
+const _FindorgRelationTypeAlreadyExistOrNot = async (id, groupId, orgRelationType) => {
     let where = [];
     if (id && id !== null && id !== 'undefined') {
         where.push(util.constructWheresForNotEqualSequelize('id', id));
@@ -187,21 +184,20 @@ const _FindorgRelationTypeAlreadyExistOrNot = async (id,groupId, orgRelationType
     else {
         return 'success'
     }
-}
-
+};
 const saveorgRelationTypeMaster = async (req, res) => {
     try {
         const orgRelationTypeMaster = req.body;
 
-       
-        console.log("Organisation Relation Type Master : ",orgRelationTypeMaster);
+
+        console.log("Organisation Relation Type Master : ", orgRelationTypeMaster);
         const PKID = orgRelationTypeMaster && orgRelationTypeMaster.id ? orgRelationTypeMaster.id : undefined;
         const ChekAlreadyExist = await _FindorgRelationTypeAlreadyExistOrNot(PKID, orgRelationTypeMaster.groupId, orgRelationTypeMaster.orgRelationType);
         let CodeMsg = orgRelationTypeMaster && orgRelationTypeMaster.orgRelationType ? 'Relation Type  "' + orgRelationTypeMaster.orgRelationType + '" already in use' : 'Org relation type already in use';
         if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
 
-       if(req.user && req.user.id !==null)
-       UserId = req.user.id;
+        if (req.user && req.user.id !== null)
+            UserId = req.user.id;
         if (util.missingRequiredFields('orgRelationTypeMaster', orgRelationTypeMaster, res) === '') {
             await dal.saveData(db.orgRelationTypeMaster, orgRelationTypeMaster, res, UserId);
         }
@@ -213,11 +209,10 @@ const saveorgRelationTypeMaster = async (req, res) => {
         responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving org relation type master details');
     }
 };
-
 const deleteOrgRelationTypeMaster = async (req, res) => {
     try {
-        if(req.user && req.user.id !==null)
-         UserId = req.user.id;
+        if (req.user && req.user.id !== null)
+            UserId = req.user.id;
         if (!req.query.id) {
             throw util.generateWarning(`Please provide org relation type master id`, codes.ID_NOT_FOUND);
         }
@@ -1188,6 +1183,251 @@ const getStatusMaster = async (req, res) => {
 //#endregion
 
 
+//#region  Country  Master  
+const getCountryMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.countryMaster, req.query.id);
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting country master data');
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getCountryMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.id) {
+            return getCountryMasterById(req, res);
+        }
+        else {
+            await dal.getList({ model: db.countryMaster, where, order: [['countryName', 'Asc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting country details');
+    }
+};
+
+//#endregion
+
+//#region  State  Master  
+const getStateMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.stateMaster, req.query.id);
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting state master data');
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getStateMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.countryId) {
+            where.push(util.constructWheresForSequelize('countryId', req.query.countryId));
+        }
+        if (req.query.id) {
+            return getStateMasterById(req, res);
+        }
+        else {
+            await dal.getList({ model: db.stateMaster, where, order: [['stateName', 'Asc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting state details');
+    }
+};
+
+//#endregion
+
+//#region  City  Master  
+const getCityMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.cityMaster, req.query.id);
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting city master data');
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getCityMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.id) {
+            return getCityMasterById(req, res);
+        }
+        else {
+            await dal.getList({ model: db.cityMaster, where, order: [['cityName', 'Asc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting city details');
+    }
+};
+
+//#endregion
+
+//#region  Gender  Master  
+
+const getGenderMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.genderMaster, req.query.id);
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting gender master data');
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getGenderMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.id) {
+            return getGenderMasterById(req, res);
+        }
+        else {
+            await dal.getList({ model: db.genderMaster, where, order: [['genderName', 'Asc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting gender details');
+    }
+};
+
+//#endregion
+
+//#region  Organisation Details Master  
+const getOrganisationDetailsById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.organisationDetails, req.query.id);
+
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Organisation Details');
+    }
+};
+const _findOrganisationDetailsId = async (orgRelationTypeId, groupId, orgDetailsParentId, isActive, id) => {
+    let where = [];
+    if (id && id !== null && id !== 'undefined') {
+        where.push(util.constructWheresForNotEqualSequelize('id', id));
+    }
+    where.push(util.constructWheresForSequelize('active', 1));
+    if(orgRelationTypeId)
+    {
+        where.push(util.constructWheresForSequelize('orgRelationTypeId', orgRelationTypeId));
+    }
+    if(groupId)
+    {
+        where.push(util.constructWheresForSequelize('groupId', groupId));
+    }
+    if(orgDetailsParentId)
+    {
+        where.push(util.constructWheresForSequelize('orgDetailsParentId', orgDetailsParentId));
+    }   
+    console.log('_findOrganisationDetailsId db : ',db)
+    const OrganisationDetailsre = await dal.getList({ model: db.organisationDetails, where, order: [['createdAt', 'desc']], include: false, });
+    console.log('OrganisationDetails Details : ',OrganisationDetailsre);
+    if (OrganisationDetailsre && OrganisationDetailsre.length > 0) {
+        return 'already exist'
+    }
+    else {
+        return 'success'
+    }
+};
+const getOrganisationDetails = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('active', 1));
+
+
+        if (req.query.id) {
+            return getOrganisationDetailsById(req, res);
+        }
+        else {
+            db.sequelize.query('call asp_nk_cm_org_details_get_org_details(:p_org_details_id, :p_org_relation_type_id, :p_group_id, :p_org_details_parent_id)',
+                {
+                    replacements: {
+                        p_org_details_id: req.query.id ? req.query.id : '',
+                        p_org_relation_type_id: req.query.orgRelationTypeId ? req.query.orgRelationTypeId : '',
+                        p_group_id: req.query.groupId ? req.query.groupId : '',
+                        p_org_details_parent_id: req.query.orgDetailsParentId ? req.query.orgDetailsParentId : '',
+                    }
+                }).then(results => {
+                    responseHelper.success(res, 200, results, 'Organisation Details List got successfully', '-1', results.length);
+                }).catch(err => {
+                    responseHelper.error(res, err.code ? err.code : codes.ERROR, err, 'Error in Organisation Details');
+
+                });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Organisation Details');
+    }
+};
+const saveOrganisationDetails = async (req, res) => {
+    try {
+        const OrganisationDetails = req.body;
+        let PKID = OrganisationDetails && OrganisationDetails.id ? OrganisationDetails.id : undefined;
+        const ChekAlreadyExist = await _findOrganisationDetailsId(OrganisationDetails.orgRelationTypeId, OrganisationDetails.groupId, OrganisationDetails.orgDetailsParentId, true, PKID)
+        if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning('Organisation Details  already in use', codes.CODE_ALREADY_EXISTS);
+
+        if (util.missingRequiredFields('OrganisationDetails', OrganisationDetails, res) === '') {
+            await dal.saveData(db.organisationDetails, OrganisationDetails, res, req.user.id);
+        }
+        else {
+            console.log("Backend organisation Details Data else condition", req)
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving organisation Details');
+    }
+};
+const deleteOrganisationDetails = async (req, res) => {
+    try {
+        //console.log("delete Due Day req : ", req);
+        if (!req.query.id) {
+            throw util.generateWarning(`Please provide organisation id`, codes.ID_NOT_FOUND);
+        }
+        dal.deleteRecords(db.organisationDetails, req.query.id, req.user.id, res);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting organisation Details');
+    }
+};
+//#endregion
+
 module.exports.saveorgRelationTypeMaster = saveorgRelationTypeMaster;
 module.exports.deleteOrgRelationTypeMaster = deleteOrgRelationTypeMaster;
 module.exports.getOrgRelationTypeMaster = getOrgRelationTypeMaster;
@@ -1230,3 +1470,12 @@ module.exports.getplantMasterByCompanyMasterId = getplantMasterByCompanyMasterId
 
 module.exports.getYearTypeMaster = getYearTypeMaster;
 module.exports.getYearTypeMasterById = getYearTypeMasterById;
+
+module.exports.getCountryMaster = getCountryMaster;
+module.exports.getStateMaster = getStateMaster;
+module.exports.getCityMaster = getCityMaster;
+module.exports.getGenderMaster = getGenderMaster;
+
+module.exports.getOrganisationDetails = getOrganisationDetails;
+module.exports.saveOrganisationDetails = saveOrganisationDetails;
+module.exports.deleteOrganisationDetails = deleteOrganisationDetails;
