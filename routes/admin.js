@@ -15,6 +15,11 @@ router.put('/groupMaster', (req, res) => admin.saveGroupMaster(req, res));
 router.post('/groupMaster', (req, res) => admin.saveGroupMaster(req, res));
 router.delete('/groupMaster', (req, res) => admin.deleteGroupMaster(req, res));
 
+router.get('/alarmTypeMaster', (req, res) => admin.getAlarmTypeMaster(req, res));
+router.put('/alarmTypeMaster', (req, res) => admin.saveAlarmTypeMaster(req, res));
+router.post('/alarmTypeMaster', (req, res) => admin.saveAlarmTypeMaster(req, res));
+router.delete('/alarmTypeMaster', (req, res) => admin.deleteAlarmTypeMaster(req, res));
+
 router.get('/moduleMaster', (req, res) => admin.getModuleMaster(req, res));
 router.put('/moduleMaster', (req, res) => admin.saveModuleMaster(req, res));
 router.post('/moduleMaster', (req, res) => admin.saveModuleMaster(req, res));
