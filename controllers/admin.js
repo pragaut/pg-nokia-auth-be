@@ -254,7 +254,426 @@ const deleteAlarmTypeMaster = async (req, res) => {
 
 //#endregion
 
+//#region  Notification Master  
+const getNotificationMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.notificationMaster, req.query.id);
+
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Notification master data');
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getNotificationMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.id) {
+            return getNotificationMasterById(req, res);
+        }
+        else {
+            console.log("before getlist : ", where)
+            const Result = await dal.getList({ model: db.notificationMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+            console.log("after getlist : ", Result)
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Notification details');
+    }
+};
+
+const getLastNotificationOrder = async (isActive) => {
+    try {
+        const notificationMaster = await db.notificationMaster.findOne({
+            order: [['`notificationOrder`', 'desc']],
+            limit: 1,
+            where: {
+                is_active: 1
+            },
+            attributes: ['notificationOrder']
+        });
+
+        return notificationMaster;
+    }
+    catch (error) {
+        return undefined;
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+*/
+
+const _FindNotificationMasterAlreadyExistOrNot = async (id, Code) => {
+    let where = [];
+      if (id && id !== null && id !== 'undefined') {
+          where.push(util.constructWheresForNotEqualSequelize('id', id));
+      }
+      where.push(util.constructWheresForSequelize('isActive', 1));
+      where.push(util.constructWheresForSequelize('notificationCode', Code));
+  
+      const notificationMasterDetails = await dal.getList({ model: db.notificationMaster, where, order: [['createdAt', 'desc']], include: false, });
+      if (notificationMasterDetails && notificationMasterDetails.length > 0) {
+          return 'already exist'
+      }
+      else {
+          return 'success'
+      }
+      }
+  
+  const saveNotificationMaster = async (req, res) => {
+  try {
+          const notificationMaster = req.body;
+            
+          console.log("Notification Master : ",notificationMaster);
+          const PKID = notificationMaster && notificationMaster.id ? notificationMaster.id : undefined;
+          const ChekAlreadyExist = await _FindNotificationMasterAlreadyExistOrNot(PKID, notificationMaster.notificationCode);
+          let CodeMsg = notificationMaster && notificationMaster.notificationCode ? 'Notification  "' + notificationMaster.notificationCode + '" already in use' : 'Notification code already in use';
+          if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
+  
+          let lastOrder = 0;
+          if (notificationMaster.notificationOrder == null) {
+              lastOrder = await getLastNotificationOrder(true);
+              if (lastOrder && lastOrder.notificationOrder)
+              notificationMaster.notificationOrder = lastOrder.notificationOrder + 1;
+              else
+              notificationMaster.notificationOrder = 1;
+          }
+      console.log("req : ", req.user);
+         if(req.user && req.user.id !==null)
+         UserId = req.user.id;
+         //-----let primaryKey = 'notification_id';
+          if (util.missingRequiredFields('notificationMaster', notificationMaster, res) === '') {
+             //----- await dal.saveData(db.notificationMaster, notificationMaster, res, UserId, undefined, undefined, undefined, primaryKey);
+              await dal.saveData(db.notificationMaster, notificationMaster, res, UserId);
+                }
+          else {
+              console.log("Backend Notification master Data else condition", req)
+          }
+      }
+      catch (error) {
+          responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving Notification master details');
+      }
+  };
+  
+  const deleteNotificationMaster = async (req, res) => {
+  try {
+          if (req.user && req.user.id !== null)
+              UserId = req.user.id;
+          if (!req.query.id) {
+              throw util.generateWarning(`Please provide Notification master id`, codes.ID_NOT_FOUND);
+          }
+          dal.deleteRecords(db.notificationMaster, req.query.id, UserId, res);
+      }
+      catch (error) {
+          responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting Notification master details');
+      }
+  };
+
+  //#endregion
+
+//#region  Module Master  
+const getModuleMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.moduleMaster, req.query.id);
+
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Module master data');
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getModuleMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.id) {
+            return getModuleMasterById(req, res);
+        }
+        else {
+            await dal.getList({ model: db.moduleMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Module details');
+    }
+};
+
+// const getLastModuleOrder = async (isActive) => {
+//     try {
+//         const moduleMaster = await db.moduleMaster.findOne({
+//             order: [['`moduleOrder`', 'desc']],
+//             limit: 1,
+//             where: {
+//                 is_active: 1
+//             },
+//             attributes: ['moduleOrder']
+//         });
+
+//         return moduleMaster;
+//     }
+//     catch (error) {
+//         return undefined;
+//     }
+// };
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+*/
+
+const _FindModuleMasterAlreadyExistOrNot = async (id, Code) => {
+    let where = [];
+    if (id && id !== null && id !== 'undefined') {
+        where.push(util.constructWheresForNotEqualSequelize('id', id));
+    }
+    where.push(util.constructWheresForSequelize('isActive', 1));
+    where.push(util.constructWheresForSequelize('moduleCode', Code));
+
+    const moduleMasterDetails = await dal.getList({ model: db.moduleMaster, where, order: [['createdAt', 'desc']], include: false, });
+    if (moduleMasterDetails && moduleMasterDetails.length > 0) {
+        return 'already exist'
+    }
+    else {
+        return 'success'
+    }
+}
+
+const saveModuleMaster = async (req, res) => {
+    try {
+        const moduleMaster = req.body;
+
+       
+        console.log("Module Master : ",moduleMaster);
+        const PKID = moduleMaster && moduleMaster.id ? moduleMaster.id : undefined;
+        const ChekAlreadyExist = await _FindModuleMasterAlreadyExistOrNot(PKID, moduleMaster.moduleCode);
+        let CodeMsg = moduleMaster && moduleMaster.moduleCode ? 'Module  "' + moduleMaster.moduleCode + '" already in use' : 'Module code already in use';
+        if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
+
+        // let lastOrder = 0;
+        // if (moduleMaster.moduleOrder == null) {
+        //     lastOrder = await moduleOrder(true);
+        //     if (lastOrder && lastOrder.moduleOrder)
+        //     moduleMaster.moduleOrder = lastOrder.moduleOrder + 1;
+        //     else
+        //     moduleMaster.moduleOrder = 1;
+        // }
+    console.log("req : ", req.user);
+       if(req.user && req.user.id !==null)
+       UserId = req.user.id;
+       //-----let primaryKey = 'org_modules_id';
+        if (util.missingRequiredFields('moduleMaster', moduleMaster, res) === '') {
+           //----- await dal.saveData(db.moduleMaster, moduleMaster, res, UserId, undefined, undefined, undefined, primaryKey);
+            await dal.saveData(db.moduleMaster, moduleMaster, res, UserId);
+        }
+        else {
+            console.log("Backend Module master Data else condition", req)
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving Module master details');
+    }
+};
+
+const deleteModuleMaster = async (req, res) => {
+    try {
+        if(req.user && req.user.id !==null)
+         UserId = req.user.id;
+        if (!req.query.id) {
+            throw util.generateWarning(`Please provide Module master id`, codes.ID_NOT_FOUND);
+        }
+        dal.deleteRecords(db.moduleMaster, req.query.id, UserId, res);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting Module master details');
+    }
+};
+
+//#endregion
+
+//#region Year Master
+
+const getYearMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.yearMaster, req.query.id);
+
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Year Master');
+    }
+};
+
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getYearMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('active', 1));
+        if (req.query.id) {
+            return getYearMasterById(req, res);
+        }
+        else {
+            await dal.getList({ model: db.yearMaster, where, order: [['yearOrder', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Year Type Data');
+    }
+};
+
+//#endregion
+
+//#region  Role Master  
+const getRoleMasterById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.roleMaster, req.query.id);
+
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Role master data');
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+* 
+* by defaut gives last one month data.
+*/
+const getRoleMaster = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.id) {
+            return getRoleMasterById(req, res);
+        }
+        else {
+            await dal.getList({ model: db.roleMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Role details');
+    }
+};
+
+const getLastRoleOrder = async (isActive) => {
+    try {
+        const roleMaster = await db.roleMaster.findOne({
+            order: [['`roleOrder`', 'desc']],
+            limit: 1,
+            where: {
+                is_active: 1
+            },
+            attributes: ['roleOrder']
+        });
+
+        return roleMaster;
+    }
+    catch (error) {
+        return undefined;
+    }
+};
+/**
+* 
+* @param {*} req 
+* @param {*} res 
+*/
+
+const _FindRoleMasterAlreadyExistOrNot = async (id, roleName) => {
+    let where = [];
+    if (id && id !== null && id !== 'undefined') {
+        where.push(util.constructWheresForNotEqualSequelize('id', id));
+    }
+    where.push(util.constructWheresForSequelize('isActive', 1));
+    where.push(util.constructWheresForSequelize('roleName', roleName));
+
+    const roleMasterDetails = await dal.getList({ model: db.roleMaster, where, order: [['createdAt', 'desc']], include: false, });
+    if (roleMasterDetails && roleMasterDetails.length > 0) {
+        return 'already exist'
+    }
+    else {
+        return 'success'
+    }
+}
+
+const saveRoleMaster = async (req, res) => {
+    try {
+        const roleMaster = req.body;
+
+       
+        console.log("Role Master : ",roleMaster);
+        const PKID = roleMaster && roleMaster.id ? roleMaster.id : undefined;
+        const ChekAlreadyExist = await _FindRoleMasterAlreadyExistOrNot(PKID, roleMaster.roleName);
+        let CodeMsg = roleMaster && roleMaster.roleName ? 'Role  "' + roleMaster.roleName + '" already in use' : 'Role Name already in use';
+      if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
+      console.log("req : ", req.user);
+      let lastOrder = 0;
+      if (roleMaster.roleOrder == null) {
+          lastOrder = await getLastRoleOrder(true);
+          if (lastOrder && lastOrder.roleOrder)
+          roleMaster.roleOrder = lastOrder.roleOrder + 1;
+          else
+          roleMaster.roleOrder = 1;
+        }
+    console.log("req : ", req.user);
+       if(req.user && req.user.id !==null)
+       UserId = req.user.id;
+       //-----let primaryKey = 'role_id';
+        if (util.missingRequiredFields('roleMaster', roleMaster, res) === '') {
+           //----- await dal.saveData(db.roleMaster, roleMaster, res, UserId, undefined, undefined, undefined, primaryKey);
+            await dal.saveData(db.roleMaster, roleMaster, res, UserId);
+        }
+        else {
+            console.log("Backend Role master Data else condition", req)
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving Role master details');
+    }
+};
+
+const deleteRoleMaster = async (req, res) => {
+    try {
+        if(req.user && req.user.id !==null)
+         UserId = req.user.id;
+        if (!req.query.id) {
+            throw util.generateWarning(`Please provide Role master id`, codes.ID_NOT_FOUND);
+        }
+        dal.deleteRecords(db.roleMaster, req.query.id, UserId, res);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting Role master details');
+    }
+};
+
+//#endregion
+
 //#region  Org Relation Type Master
+
+
 const getOrgRelationTypeMasterById = async (req, res) => {
     try {
         const result = await dal.findById(db.orgRelationTypeMaster, req.query.id);
@@ -281,8 +700,8 @@ const getOrgRelationTypeMaster = async (req, res) => {
         }
         else {
             console.log("before getlist : ", where)
-            const Result = await dal.getList({ model: db.orgRelationTypeMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
-            console.log("after getlist : ", Result)
+           const Result = await dal.getList({ model: db.orgRelationTypeMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+           console.log("after getlist : ", Result)
         }
     }
     catch (error) {
@@ -295,7 +714,7 @@ const getOrgRelationTypeMaster = async (req, res) => {
 * @param {*} res 
 */
 
-const _FindorgRelationTypeAlreadyExistOrNot = async (id, groupId, orgRelationType) => {
+const _FindorgRelationTypeAlreadyExistOrNot = async (id,groupId, orgRelationType) => {
     let where = [];
     if (id && id !== null && id !== 'undefined') {
         where.push(util.constructWheresForNotEqualSequelize('id', id));
@@ -310,20 +729,21 @@ const _FindorgRelationTypeAlreadyExistOrNot = async (id, groupId, orgRelationTyp
     else {
         return 'success'
     }
-};
+}
+
 const saveorgRelationTypeMaster = async (req, res) => {
     try {
         const orgRelationTypeMaster = req.body;
 
-
-        console.log("Organisation Relation Type Master : ", orgRelationTypeMaster);
+       
+        console.log("Organisation Relation Type Master : ",orgRelationTypeMaster);
         const PKID = orgRelationTypeMaster && orgRelationTypeMaster.id ? orgRelationTypeMaster.id : undefined;
         const ChekAlreadyExist = await _FindorgRelationTypeAlreadyExistOrNot(PKID, orgRelationTypeMaster.groupId, orgRelationTypeMaster.orgRelationType);
         let CodeMsg = orgRelationTypeMaster && orgRelationTypeMaster.orgRelationType ? 'Relation Type  "' + orgRelationTypeMaster.orgRelationType + '" already in use' : 'Org relation type already in use';
         if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
 
-        if (req.user && req.user.id !== null)
-            UserId = req.user.id;
+       if(req.user && req.user.id !==null)
+       UserId = req.user.id;
         if (util.missingRequiredFields('orgRelationTypeMaster', orgRelationTypeMaster, res) === '') {
             await dal.saveData(db.orgRelationTypeMaster, orgRelationTypeMaster, res, UserId);
         }
@@ -335,10 +755,11 @@ const saveorgRelationTypeMaster = async (req, res) => {
         responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving org relation type master details');
     }
 };
+
 const deleteOrgRelationTypeMaster = async (req, res) => {
     try {
-        if (req.user && req.user.id !== null)
-            UserId = req.user.id;
+        if(req.user && req.user.id !==null)
+         UserId = req.user.id;
         if (!req.query.id) {
             throw util.generateWarning(`Please provide org relation type master id`, codes.ID_NOT_FOUND);
         }
@@ -349,322 +770,6 @@ const deleteOrgRelationTypeMaster = async (req, res) => {
     }
 };
 
-//#endregion
-
-//#region  Module Master
-const getModuleMasterById = async (req, res) => {
-
-    try {
-        const result = await dal.findById(db.module, req.query.id);
-
-        responseHelper.success(res, codes.SUCCESS, result);
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Module Master');
-    }
-};
-
-const _findModuleWithCode = async (Code, isActive) => {
-    const where = {};
-
-    typeof isActive === 'undefined' ? '' : where.active = isActive;
-    where.moduleCode = Code;
-
-    const module = await dal.findOne(db.module, where, true);
-
-    return module;
-};
-
-const getModuleMasterByGroupId = async (req, res) => {
-    try {
-        const where = {};
-        typeof isActive === 'undefined' ? '' : where.active = isActive;
-        where.groupMasterId = req.query.groupId;
-
-        const result = await dal.findOne(db.module, where, true);
-
-        responseHelper.success(res, codes.SUCCESS, result);
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting module master data');
-    }
-};
-
-/**
-* 
-* @param {*} req 
-* @param {*} res 
-* 
-* by defaut gives last one month data.
-*/
-const getModuleMaster = async (req, res) => {
-    try {
-        let where = [];
-        where.push(util.constructWheresForSequelize('active', 1));
-
-        if (req.query.id) {
-            return getModuleMasterById(req, res);
-        }
-        else {
-            await dal.getList({ model: db.module, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
-        }
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Chapter');
-    }
-};
-
-const getLastModuleOrder = async (isActive) => {
-    try {
-        const moduleMaster = await db.module.findOne({
-            order: [['`order`', 'desc']],
-            limit: 1,
-            where: {
-                active: 1
-            },
-            attributes: ['order']
-        });
-
-        return moduleMaster;
-    }
-    catch (error) {
-        return undefined;
-    }
-};
-
-/**
-* 
-* @param {*} req 
-* @param {*} res 
-*/
-const _FindModuleAlreadyExistOrNot = async (id, Code) => {
-    let where = [];
-    if (id && id !== null && id !== 'undefined') {
-        where.push(util.constructWheresForNotEqualSequelize('id', id));
-    }
-    where.push(util.constructWheresForSequelize('active', 1));
-    where.push(util.constructWheresForSequelize('moduleCode', Code));
-
-    const moduleDetails = await dal.getList({ model: db.module, where, order: [['createdAt', 'desc']], include: false, });
-    if (moduleDetails && moduleDetails.length > 0) {
-        return 'already exist'
-    }
-    else {
-        return 'success'
-    }
-}
-
-
-
-const saveModuleMaster = async (req, res) => {
-    try {
-        const module = req.body;
-        // if (typeof module.id === 'undefined') {
-        //     const _ModuleWithCode = await _findModuleWithCode(module.moduleCode, true);
-        //     if (module && _ModuleWithCode && module.moduleCode === _ModuleWithCode.moduleCode) throw util.generateWarning('Master Category Code already in use', codes.CODE_ALREADY_EXISTS);
-        // }
-
-        const PKID = module && module.id ? module.id : undefined;
-        const ChekAlreadyExist = await _FindModuleAlreadyExistOrNot(PKID, module.moduleCode);
-        let CodeMsg = module && module.moduleCode ? 'Module  "' + module.moduleCode + '" already in use' : 'module code already in use';
-        if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
-
-        let lastOrder = 1;
-        if (module.order == null) {
-            lastOrder = await getLastModuleOrder(true);
-            //console.log("lastOrder.Order : ", lastOrder.order);
-            if (lastOrder && lastOrder.order)
-                module.order = lastOrder.order + 1;
-            else
-                module.order = 1;
-        }
-        if (util.missingRequiredFields('', module, res) === '') {
-            await dal.saveData(db.module, module, res, req.user.id);
-        }
-        else {
-            console.log("Backend module Data else condition", req)
-        }
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving module master');
-    }
-};
-
-const deleteModuleMaster = async (req, res) => {
-
-    try {
-        if (!req.query.id) {
-            throw util.generateWarning(`Please provide module master id`, codes.ID_NOT_FOUND);
-        }
-        dal.deleteRecords(db.module, req.query.id, req.user.id, res);
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting module master');
-    }
-};
-//#endregion
-
-//#region Role Master
-const getRoleMasterById = async (req, res) => {
-
-    try {
-        const result = await dal.findById(db.roleMaster, req.query.id);
-
-        responseHelper.success(res, codes.SUCCESS, result);
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting role master data');
-    }
-};
-
-const getRoleMasterByModuleId = async (req, res) => {
-    try {
-        const where = {};
-        typeof isActive === 'undefined' ? '' : where.active = isActive;
-        where.moduleId = req.query.moduleId;
-
-        const result = await dal.findOne(db.roleMaster, where, true);
-
-        responseHelper.success(res, codes.SUCCESS, result);
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting role master data');
-    }
-};
-
-const _findRoleWithCode = async (Code, isActive) => {
-    const where = {};
-
-    typeof isActive === 'undefined' ? '' : where.active = isActive;
-    where.roleCode = Code;
-    //where.emailConfirmed = 1;
-
-    const roleMaster = await dal.findOne(db.roleMaster, where, true);
-
-    //console.log('find one: ', user);
-    return roleMaster;
-};
-
-
-/**
-* 
-* @param {*} req 
-* @param {*} res 
-* 
-* by defaut gives last one month data.
-*/
-const getRoleMaster = async (req, res) => {
-    try {
-
-        // let where = [];
-        // where.push(util.constructWheresForSequelize('active', 1));
-        let where = [];
-        where.push(util.constructWheresForSequelize('active', 1));
-
-        if (req.query.id) {
-            return getRoleMasterById(req, res);
-        }
-        else {
-            await dal.getList({ model: db.roleMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
-        }
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Chapter');
-    }
-};
-
-const getLastRoleOrder = async (isActive) => {
-    try {
-        const roleMaster = await db.roleMaster.findOne({
-            order: [['roleOrder', 'desc']],
-            limit: 1,
-            where: {
-                active: 1
-            },
-            attributes: ['roleOrder']
-        });
-
-        return roleMaster;
-    }
-    catch (error) {
-        return undefined;
-    }
-};
-
-/**
-* 
-* @param {*} req 
-* @param {*} res 
-
-
-
-*/
-
-const _FindRoleAlreadyExistOrNot = async (id, Code) => {
-    let where = [];
-    if (id && id !== null && id !== 'undefined') {
-        where.push(util.constructWheresForNotEqualSequelize('id', id));
-    }
-    where.push(util.constructWheresForSequelize('active', 1));
-    where.push(util.constructWheresForSequelize('roleCode', Code));
-
-    const roleMasterDetails = await dal.getList({ model: db.roleMaster, where, order: [['createdAt', 'desc']], include: false, });
-    if (roleMasterDetails && roleMasterDetails.length > 0) {
-        return 'already exist'
-    }
-    else {
-        return 'success'
-    }
-}
-
-const saveRoleMaster = async (req, res) => {
-    try {
-        const roleMaster = req.body;
-        // if (typeof roleMaster.id === 'undefined') {
-        //     const _RoleWithCode = await _findRoleWithCode(roleMaster.roleCode, true);
-        //     if (roleMaster && _RoleWithCode && roleMaster.roleCode === _RoleWithCode.roleCode) throw util.generateWarning('Role Master Code already in use', codes.CODE_ALREADY_EXISTS);
-        // }
-
-
-        const PKID = roleMaster && roleMaster.id ? roleMaster.id : undefined;
-        const ChekAlreadyExist = await _FindRoleAlreadyExistOrNot(PKID, roleMaster.roleCode);
-        let CodeMsg = roleMaster && roleMaster.roleCode ? 'Role  "' + roleMaster.roleCode + '" already in use' : 'Role code already in use';
-        if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
-
-        let lastOrder = 0;
-        if (roleMaster.roleOrder == null) {
-            lastOrder = await getLastRoleOrder(true);
-            //console.log("lastOrder : ", lastOrder);
-            //console.log("lastOrder.roleOrder : ", lastOrder.roleOrder);
-            if (lastOrder && lastOrder.roleOrder)
-                roleMaster.roleOrder = lastOrder.roleOrder + 1;
-            else
-                roleMaster.roleOrder = 1;
-        }
-        if (util.missingRequiredFields('roleMaster', roleMaster, res) === '') {
-            await dal.saveData(db.roleMaster, roleMaster, res, req.user.id);
-        }
-        else {
-            console.log("Backend roleMaster Data else condition", req)
-        }
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving Role Master');
-    }
-};
-
-const deleteRoleMaster = async (req, res) => {
-
-    try {
-        if (!req.query.id) {
-            throw util.generateWarning(`Please provide role id`, codes.ID_NOT_FOUND);
-        }
-        dal.deleteRecords(db.roleMaster, req.query.id, req.user.id, res);
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting Role Master');
-    }
-};
 //#endregion
 
 //#region Group Company Master
@@ -1123,157 +1228,6 @@ const getYearTypeMaster = async (req, res) => {
 
 //#endregion
 
-//#region  Year Master
-const getYearMasterById = async (req, res) => {
-    try {
-        const result = await dal.findById(db.yearMaster, req.query.id);
-
-        responseHelper.success(res, codes.SUCCESS, result);
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Module Master');
-    }
-};
-
-const _findYearWithCode = async (yearName, isActive) => {
-    const where = {};
-
-    typeof isActive === 'undefined' ? '' : where.active = isActive;
-    where.yearName = yearName;
-    const yearMaster = await dal.findOne(db.yearMaster, where, true);
-
-    return yearMaster;
-};
-
-
-/**
-* 
-* @param {*} req 
-* @param {*} res 
-* 
-* by defaut gives last one month data.
-*/
-const getYearMaster = async (req, res) => {
-    try {
-        //console.log("eq.query : ", req.query);
-        let where = [];
-        where.push(util.constructWheresForSequelize('active', 1));
-        if (req.query.where) {
-            let queryWhere = JSON.parse(req.query.where);
-            for (let item of queryWhere) {
-                where.push(util.constructWheresForSequelize(item.key, item.value));
-            }
-        }
-        //console.log("Year Master where : ", where)
-        if (req.query.id) {
-            return getYearMasterById(req, res);
-        }
-        else {
-            let Attribute = {
-                include: [
-                    [
-                        db.sequelize.literal(`(
-                            CASE
-                                WHEN CURRENT_DATE() BETWEEN startDate AND endDate THEN 1 ELSE 0
-                            END
-                        )`),
-                        'isCurrentYear'
-                    ]
-                ]
-            }
-
-            await dal.getList({ model: db.yearMaster, where, order: [['yearTypeMasterId', 'desc'], ['yearName', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res, undefined, includedAttributes: Attribute });
-        }
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Groups');
-    }
-};
-
-/**
-* 
-* @param {*} req 
-* @param {*} res  
-*/
-
-const _FindYearAlreadyExistOrNot = async (id, yearname, starDate, endDate) => {
-    let where = [];
-    if (id && id !== null && id !== 'undefined') {
-        where.push(util.constructWheresForNotEqualSequelize('id', id));
-    }
-    where.push(util.constructWheresForSequelize('active', 1));
-    where.push(
-        util.constructWheresForSequelize('yearName', yearname)
-    );
-
-    const where1 = [{
-        active: 1,
-        yearName: yearname,
-        // starDate : {
-        //     [Op.between]: [{ starDate: starDate }, { enddate: endDate }],
-        // },
-        // id: {
-        //     [Op.ne] :id
-        // }
-    }];
-
-
-
-    // where.push(util.constructWheresForbetweenSequelize('startDate', starDate, endDate,[starDate,endDate]));
-    // where.push(util.constructWheresForbetweenSequelize('endDate', starDate, endDate));
-
-    //console.log("Where Condition of year", where1)
-    const yearMasterDetails = await dal.getList({ model: db.yearMaster, where, order: [['createdAt', 'desc']], include: false, });
-    if (yearMasterDetails && yearMasterDetails.length > 0) {
-        return 'already exist'
-    }
-    else {
-        return 'success'
-    }
-}
-
-const saveYearMaster = async (req, res) => {
-    try {
-        const yearMaster = req.body;
-        // if (typeof yearMaster.id === 'undefined') {
-        //     const _YearWithCode = await _findYearWithCode(yearMaster.yearName, true);
-        //     if (yearMaster && _YearWithCode && yearMaster.yearName === _YearWithCode.yearName) throw util.generateWarning('Year already in use', codes.CODE_ALREADY_EXISTS);
-
-        // }
-        //console.log("year Master before Save", yearMaster)
-        const PKID = yearMaster && yearMaster.id ? yearMaster.id : undefined;
-        const ChekAlreadyExist = await _FindYearAlreadyExistOrNot(PKID, yearMaster.yearName, yearMaster.startDate, yearMaster.enddate);
-        let CodeMsg = yearMaster && yearMaster.yearName ? 'Year  "' + yearMaster.yearName + '" already in use' : 'Year code already in use';
-        if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
-
-
-        if (util.missingRequiredFields('yearMaster', yearMaster, res) === '') {
-            await dal.saveData(db.yearMaster, yearMaster, res, req.user.id);
-        }
-        else {
-            console.log("Backend Year Data else condition", req)
-        }
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving group master details');
-    }
-};
-
-const deleteYearMaster = async (req, res) => {
-    try {
-        //console.log("delete group req : ", req);
-        if (!req.query.id) {
-            throw util.generateWarning(`Please provide Year master id`, codes.ID_NOT_FOUND);
-        }
-        dal.deleteRecords(db.yearMaster, req.query.id, req.user.id, res);
-    }
-    catch (error) {
-        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting group master details');
-    }
-};
-
-//#endregion
-
 //#region Status Master
 
 const getStatusMasterById = async (req, res) => {
@@ -1667,15 +1621,24 @@ module.exports.saveAlarmTypeMaster = saveAlarmTypeMaster;
 module.exports.deleteAlarmTypeMaster = deleteAlarmTypeMaster;
 module.exports.getAlarmTypeMaster = getAlarmTypeMaster;
 
+module.exports.saveNotificationMaster = saveNotificationMaster;
+module.exports.deleteNotificationMaster = deleteNotificationMaster;
+module.exports.getNotificationMaster = getNotificationMaster;
+
 module.exports.saveModuleMaster = saveModuleMaster;
 module.exports.deleteModuleMaster = deleteModuleMaster;
 module.exports.getModuleMaster = getModuleMaster;
-module.exports.getModuleMasterByGroupId = getModuleMasterByGroupId;
+
+module.exports.getYearMaster = getYearMaster;
+module.exports.getYearMasterById = getYearMasterById;
 
 module.exports.saveRoleMaster = saveRoleMaster;
 module.exports.deleteRoleMaster = deleteRoleMaster;
 module.exports.getRoleMaster = getRoleMaster;
+<<<<<<< HEAD
 module.exports.getRoleMasterByModuleId = getRoleMasterByModuleId;
+=======
+>>>>>>> f5ad3af56a4341cc5d94b0963c3b5068fcc2be9f
 
 module.exports.saveCompanyMaster = saveCompanyMaster;
 module.exports.deleteCompanyMaster = deleteCompanyMaster;
@@ -1688,10 +1651,6 @@ module.exports.getplantMaster = getplantMaster;
 //module.exports.getplantMasterByGroupCompanyMasterId = getplantMasterByGroupCompanyMasterId;
 module.exports.getplantMasterByGroupCompanyMasterId = getPlantsByCompanyMasterId;
 module.exports.getPlantByCompanyID_UsingProcedure = getPlantByCompanyID_UsingProcedure;
-
-module.exports.saveYearMaster = saveYearMaster;
-module.exports.deleteYearMaster = deleteYearMaster;
-module.exports.getYearMaster = getYearMaster;
 
 module.exports.getStatusMaster = getStatusMaster;
 module.exports.getStatusMasterById = getStatusMasterById;

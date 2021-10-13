@@ -1,26 +1,26 @@
 module.exports = function (sequelize, DataTypes) {
-	const year_Details = sequelize.define('yearMaster', {
+	const notification_Details = sequelize.define('notificationMaster', {
 		id: {
 			type: DataTypes.STRING,
 			primaryKey: true,
-			field : 'year_id'
+			field : 'notification_id'
 		},
-		yearName: {
+		notificationName: {
 			type : DataTypes.STRING,
-			field : 'year_name'
+			field : 'notification_name'
 		},
-		yearOrder: {
+		notificationCode: {
 			type : DataTypes.STRING,
-			field : 'year_order'
+			field : 'notification_code'
 		},
-		startDate: {
-			type : DataTypes.DATE,
-			field : 'start_date'
+		notificationOrder: {
+			type : DataTypes.STRING,
+			field : 'notification_order'
 		},
-		endDate: {
-			type : DataTypes.DATE,
-			field : 'end_date'
-        },
+		alarmTypeId: {
+			type : DataTypes.STRING,
+			field : 'alarm_type_id'
+		},
 		isActive: {
 			type : DataTypes.BOOLEAN,
 			field : 'is_active'
@@ -43,7 +43,7 @@ module.exports = function (sequelize, DataTypes) {
 		  }
 	},
 		{
-			tableName: 'tbl_nk_cm_years',
+			tableName: 'tbl_nk_cm_notifications',
 			classMethods: {
 				associate: function (Models) {
 					// associations can be defined here
@@ -51,5 +51,5 @@ module.exports = function (sequelize, DataTypes) {
 			}
 		});
 
-	return year_Details;
+	return notification_Details;
 };
