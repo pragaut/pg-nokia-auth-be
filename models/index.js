@@ -54,6 +54,8 @@ db.yearMaster.belongsTo(db.yearTypeMaster , { as: 'yearType', foreignKey: 'yearT
 db.companyMaster.belongsTo(db.yearTypeMaster,{as :'yearType',foreignKey:'yearTypeMasterId'});
 db.user.belongsTo(db.employeeMaster,{as :'employeeMaster',foreignKey:'employeeId'});
 db.orgRelationTypeMaster.belongsTo(db.groupMaster,{as :'group',foreignKey:'groupId'});
+db.notificationMaster.belongsTo(db.alarmTypeMaster,{as :'alarmType', foreignKey:'alarmTypeId'});
+db.roleMaster.belongsTo(db.moduleMaster,{as :'module', foreignKey:'orgModulesId'});
 // db.module.belongsTo(db.roleMaster);
 // db.roleMaster.hasMany(db.module)
 

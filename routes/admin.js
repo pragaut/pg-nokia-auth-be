@@ -20,17 +20,26 @@ router.put('/alarmTypeMaster', (req, res) => admin.saveAlarmTypeMaster(req, res)
 router.post('/alarmTypeMaster', (req, res) => admin.saveAlarmTypeMaster(req, res));
 router.delete('/alarmTypeMaster', (req, res) => admin.deleteAlarmTypeMaster(req, res));
 
+router.get('/notificationMaster', (req, res) => admin.getNotificationMaster(req, res));
+router.put('/notificationMaster', (req, res) => admin.saveNotificationMaster(req, res));
+router.post('/notificationMaster', (req, res) => admin.saveNotificationMaster(req, res));
+router.delete('/notificationMaster', (req, res) => admin.deleteNotificationMaster(req, res));
+
 router.get('/moduleMaster', (req, res) => admin.getModuleMaster(req, res));
 router.put('/moduleMaster', (req, res) => admin.saveModuleMaster(req, res));
 router.post('/moduleMaster', (req, res) => admin.saveModuleMaster(req, res));
 router.delete('/moduleMaster', (req, res) => admin.deleteModuleMaster(req, res));
-router.get('/moduleMaster/getByGroupId', (req, res) => admin.getModuleMasterByGroupId(req, res));
+
+//#region Year Master
+router.get('/yearMaster', (req, res) => admin.getYearMaster(req, res));
+router.get('/yearMaster', (req, res) => admin.getYearMasterById(req, res));
+//#endregion
 
 router.get('/roleMaster', (req, res) => admin.getRoleMaster(req, res));
 router.put('/roleMaster', (req, res) => admin.saveRoleMaster(req, res));
 router.post('/roleMaster', (req, res) => admin.saveRoleMaster(req, res));
 router.delete('/roleMaster', (req, res) => admin.deleteRoleMaster(req, res));
-router.get('/roleMaster/getByModuleId', (req, res) => admin.getRoleMasterByModuleId(req, res));
+//router.get('/roleMaster/getByModuleId', (req, res) => admin.getRoleMasterByModuleId(req, res));
 
 router.get('/companyMaster', (req, res) => admin.getCompanyMaster(req, res));
 router.put('/companyMaster', (req, res) => admin.saveCompanyMaster(req, res));
@@ -45,12 +54,6 @@ router.delete('/plantMaster', (req, res) => admin.deleteplantMaster(req, res));
 router.get('/plantMaster/getByGroupCompanyMasterId', (req, res) => admin.getplantMasterByGroupCompanyMasterId(req, res));
 router.get('/plantMaster/getPlantByCompanyId', (req, res) => admin.getplantMasterByCompanyMasterId(req, res));
 router.get('/plantMaster/getPlantByCompanyID_UsingProcedure', (req, res) => admin.getPlantByCompanyID_UsingProcedure(req, res));
-
-router.get('/yearMaster', (req, res) => admin.getYearMaster(req, res));
-router.get('/yearMaster/ByYearTypeId', (req, res) => admin.getYearMaster(req, res));
-router.put('/yearMaster', (req, res) => admin.saveYearMaster(req, res));
-router.post('/yearMaster', (req, res) => admin.saveYearMaster(req, res));
-router.delete('/yearMaster', (req, res) => admin.deleteYearMaster(req, res));
 
 //#region Status Master
 router.get('/statusMaster', (req, res) => admin.getStatusMaster(req, res));

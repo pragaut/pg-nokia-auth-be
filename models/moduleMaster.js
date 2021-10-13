@@ -1,23 +1,23 @@
 module.exports = function (sequelize, DataTypes) {
-    const module = sequelize.define('module', {
-        id: {
-            type: DataTypes.STRING,
-            primaryKey: true,
-            field:'org_modules_id'
-        },
-        orgDetailsId: {
+	const module_Details = sequelize.define('moduleMaster', {
+		id: {
+			type: DataTypes.STRING,
+			primaryKey: true,
+			field : 'org_modules_id'
+		},
+		orgDetailsId: {
 			type : DataTypes.STRING,
 			field : 'org_details_id'
 		},
-        moduleName: {
+		moduleName: {
 			type : DataTypes.STRING,
 			field : 'module_name'
 		},
-        moduleCode: {
+		moduleCode: {
 			type : DataTypes.STRING,
 			field : 'module_code'
 		},
-        isActive: {
+		isActive: {
 			type : DataTypes.BOOLEAN,
 			field : 'is_active'
 		},		
@@ -37,15 +37,15 @@ module.exports = function (sequelize, DataTypes) {
 			type: DataTypes.DATE,
 			field: 'modified_on'
 		  }
-    },
-        {
-            tableName: 'tbl_ModuleMaster',
-            classMethods: {
-                associate: function (Models) {
-                    // associations can be defined here
-                }
-            }
-        });
+	},
+		{
+			tableName: 'tbl_nk_cm_org_modules',
+			classMethods: {
+				associate: function (Models) {
+					// associations can be defined here
+				}
+			}
+		});
 
-    return module;
+	return module_Details;
 };
