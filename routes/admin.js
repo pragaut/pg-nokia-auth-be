@@ -65,4 +65,27 @@ router.get('/yearTypeMaster', (req, res) => admin.getYearTypeMaster(req, res));
 router.get('/yearTypeMaster', (req, res) => admin.getYearTypeMasterById(req, res));
 //#endregion
 
+//#region Country Master
+router.get('/countryMaster', (req, res) => admin.getCountryMaster(req, res));
+//#endregion
+
+//#region Stare Master
+router.get('/stateMaster', (req, res) => admin.getStateMaster(req, res));
+//#endregion
+
+//#region City Master
+router.get('/cityMaster', (req, res) => admin.getCityMaster(req, res));
+//#endregion
+
+//#region Gender Master
+router.get('/genderMaster', (req, res) => admin.getGenderMaster(req, res));
+//#endregion
+
+//#region Gender Master
+router.get('/organisationDetails', (req, res) => admin.getOrganisationDetails(req, res));
+router.put('/organisationDetails', (req, res) => admin.saveOrganisationDetails(req, res));
+router.post('/organisationDetails', (req, res) => admin.saveOrganisationDetails(req, res));
+router.delete('/organisationDetails', (req, res) => admin.deleteOrganisationDetails(req, res));
+//#endregion
+
 module.exports = router;
