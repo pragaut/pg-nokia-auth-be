@@ -56,6 +56,7 @@ db.user.belongsTo(db.employeeMaster,{as :'employeeMaster',foreignKey:'employeeId
 db.orgRelationTypeMaster.belongsTo(db.groupMaster,{as :'group',foreignKey:'groupId'});
 db.notificationMaster.belongsTo(db.alarmTypeMaster,{as :'alarmType', foreignKey:'alarmTypeId'});
 db.roleMaster.belongsTo(db.moduleMaster,{as :'module', foreignKey:'orgModulesId'});
+db.moduleMaster.belongsTo(db.organisationDetails,{as :'orgName', foreignKey:'orgDetailsId'});
 // db.module.belongsTo(db.roleMaster);
 // db.roleMaster.hasMany(db.module)
 

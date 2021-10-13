@@ -281,7 +281,7 @@ const getNotificationMaster = async (req, res) => {
         }
         else {
             console.log("before getlist : ", where)
-            const Result = await dal.getList({ model: db.orgRelationTypeMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+            const Result = await dal.getList({ model: db.notificationMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
             console.log("after getlist : ", Result)
         }
     }
@@ -1514,6 +1514,7 @@ const deleteOrganisationDetails = async (req, res) => {
     }
 };
 //#endregion
+
 
 module.exports.saveorgRelationTypeMaster = saveorgRelationTypeMaster;
 module.exports.deleteOrgRelationTypeMaster = deleteOrgRelationTypeMaster;
