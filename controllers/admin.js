@@ -1277,6 +1277,9 @@ const getCityMaster = async (req, res) => {
     try {
         let where = [];
         where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.stateId) {
+            where.push(util.constructWheresForSequelize('stateId', req.query.stateId));
+        }
         if (req.query.id) {
             return getCityMasterById(req, res);
         }
@@ -1338,12 +1341,16 @@ const getOrganisationDetailsById = async (req, res) => {
         responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Organisation Details');
     }
 };
-const _findOrganisationDetailsId = async (orgRelationTypeId, groupId, orgDetailsParentId, isActive, id) => {
+const _findOrganisationDetailsId = async (orgName, orgRelationTypeId, groupId, orgDetailsParentId, isActive, id) => {
     let where = [];
     if (id && id !== null && id !== 'undefined') {
         where.push(util.constructWheresForNotEqualSequelize('id', id));
     }
-    where.push(util.constructWheresForSequelize('active', 1));
+    where.push(util.constructWheresForSequelize('isActive', 1));
+    if(orgName)
+    {
+        where.push(util.constructWheresForSequelize('orgName', orgName));
+    }
     if(orgRelationTypeId)
     {
         where.push(util.constructWheresForSequelize('orgRelationTypeId', orgRelationTypeId));
@@ -1369,7 +1376,7 @@ const _findOrganisationDetailsId = async (orgRelationTypeId, groupId, orgDetails
 const getOrganisationDetails = async (req, res) => {
     try {
         let where = [];
-        where.push(util.constructWheresForSequelize('active', 1));
+        where.push(util.constructWheresForSequelize('isActive', 1));
 
 
         if (req.query.id) {
@@ -1400,7 +1407,7 @@ const saveOrganisationDetails = async (req, res) => {
     try {
         const OrganisationDetails = req.body;
         let PKID = OrganisationDetails && OrganisationDetails.id ? OrganisationDetails.id : undefined;
-        const ChekAlreadyExist = await _findOrganisationDetailsId(OrganisationDetails.orgRelationTypeId, OrganisationDetails.groupId, OrganisationDetails.orgDetailsParentId, true, PKID)
+        const ChekAlreadyExist = await _findOrganisationDetailsId(OrganisationDetails.orgName,OrganisationDetails.orgRelationTypeId, OrganisationDetails.groupId, OrganisationDetails.orgDetailsParentId, true, PKID)
         if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning('Organisation Details  already in use', codes.CODE_ALREADY_EXISTS);
 
         if (util.missingRequiredFields('OrganisationDetails', OrganisationDetails, res) === '') {

@@ -16,8 +16,7 @@ module.exports = function (sequelize, DataTypes) {
         orgDetailsParentId :{
             type : DataTypes.STRING,
             field : 'org_details_parent_id'
-        },
-        orgName :{
+        },orgName :{
             type : DataTypes.STRING,
             field : 'org_name'
         },
@@ -54,10 +53,10 @@ module.exports = function (sequelize, DataTypes) {
             field : 'phone'
         },
         isActive :{
-            type : DataTypes.STRING,
+            type : DataTypes.BOOLEAN,
             field : 'is_active'
-        },
-        createdBy: {
+        },		
+		createdBy: {
 			type : DataTypes.STRING,
 			field : 'created_by'
 		},
@@ -73,15 +72,15 @@ module.exports = function (sequelize, DataTypes) {
 			type: DataTypes.DATE,
 			field: 'modified_on'
 		  }
-
-
-    }, {
-        tableName: 'tbl_nk_cm_org_details',
-        classMethods: {
-            associate: function (Models) {
-                // associations can be defined here
+    },
+        {
+            tableName: 'tbl_nk_cm_org_details',
+            classMethods: {
+                associate: function (Models) {
+                    // associations can be defined here
+                }
             }
-        }
-    });
+        });
+
     return organisationDetails;
 };
