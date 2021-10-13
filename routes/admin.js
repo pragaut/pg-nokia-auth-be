@@ -85,4 +85,12 @@ router.post('/organisationDetails', (req, res) => admin.saveOrganisationDetails(
 router.delete('/organisationDetails', (req, res) => admin.deleteOrganisationDetails(req, res));
 //#endregion
 
+//#region Gender Master
+router.get('/organisationEmployeeDetails', (req, res) => admin.getOrganisationEmployeeDetails(req, res));
+router.put('/organisationEmployeeDetails', (req, res) => admin.saveOrganisationEmployeeDetails(req, res));
+router.post('/organisationEmployeeDetails', (req, res) => admin.saveOrganisationEmployeeDetails(req, res));
+router.delete('/organisationEmployeeDetails', (req, res) => admin.deleteOrganisationEmployeeDetails(req, res));
+//#endregion
+
+
 module.exports = router;
