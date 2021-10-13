@@ -1635,10 +1635,7 @@ module.exports.getYearMasterById = getYearMasterById;
 module.exports.saveRoleMaster = saveRoleMaster;
 module.exports.deleteRoleMaster = deleteRoleMaster;
 module.exports.getRoleMaster = getRoleMaster;
-<<<<<<< HEAD
 module.exports.getRoleMasterByModuleId = getRoleMasterByModuleId;
-=======
->>>>>>> f5ad3af56a4341cc5d94b0963c3b5068fcc2be9f
 
 module.exports.saveCompanyMaster = saveCompanyMaster;
 module.exports.deleteCompanyMaster = deleteCompanyMaster;
