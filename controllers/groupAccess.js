@@ -12,6 +12,7 @@ module.exports.findGroupAccessToModule = async (accessGroupId, moduleName) => {
     where.push(util.constructWheresForSequelize('moduleName', moduleName));
     where.push(util.constructWheresForSequelize('active', true));
 
+    console.log("group access ",where);
     const access = await dal.getList({ model: db.groupAccess, where });
 
 

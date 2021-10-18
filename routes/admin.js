@@ -39,7 +39,7 @@ router.get('/roleMaster', (req, res) => admin.getRoleMaster(req, res));
 router.put('/roleMaster', (req, res) => admin.saveRoleMaster(req, res));
 router.post('/roleMaster', (req, res) => admin.saveRoleMaster(req, res));
 router.delete('/roleMaster', (req, res) => admin.deleteRoleMaster(req, res));
-//router.get('/roleMaster/getByModuleId', (req, res) => admin.getRoleMasterByModuleId(req, res));
+router.get('/roleMaster/getByModuleId', (req, res) => admin.getRoleMasterByModuleId(req, res));
 
 router.get('/companyMaster', (req, res) => admin.getCompanyMaster(req, res));
 router.put('/companyMaster', (req, res) => admin.saveCompanyMaster(req, res));
