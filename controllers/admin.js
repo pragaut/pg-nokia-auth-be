@@ -457,9 +457,7 @@ const _FindModuleMasterAlreadyExistOrNot = async (id, Code) => {
 
 const saveModuleMaster = async (req, res) => {
     try {
-        const moduleMaster = req.body;
-
-       
+        const moduleMaster = req.body;       
         console.log("Module Master : ",moduleMaster);
         const PKID = moduleMaster && moduleMaster.id ? moduleMaster.id : undefined;
         const ChekAlreadyExist = await _FindModuleMasterAlreadyExistOrNot(PKID, moduleMaster.moduleCode);
@@ -617,13 +615,14 @@ const getLastRoleOrder = async (isActive) => {
 * @param {*} res 
 */
 
-const _FindRoleMasterAlreadyExistOrNot = async (id, roleName) => {
+const _FindRoleMasterAlreadyExistOrNot = async (id, roleName,orgModulesId) => {
     let where = [];
     if (id && id !== null && id !== 'undefined') {
         where.push(util.constructWheresForNotEqualSequelize('id', id));
     }
     where.push(util.constructWheresForSequelize('isActive', 1));
     where.push(util.constructWheresForSequelize('roleName', roleName));
+    where.push(util.constructWheresForSequelize('orgModulesId', orgModulesId));
 
     const roleMasterDetails = await dal.getList({ model: db.roleMaster, where, order: [['createdAt', 'desc']], include: false, });
     if (roleMasterDetails && roleMasterDetails.length > 0) {
@@ -641,7 +640,7 @@ const saveRoleMaster = async (req, res) => {
        
         console.log("Role Master : ",roleMaster);
         const PKID = roleMaster && roleMaster.id ? roleMaster.id : undefined;
-        const ChekAlreadyExist = await _FindRoleMasterAlreadyExistOrNot(PKID, roleMaster.roleName);
+        const ChekAlreadyExist = await _FindRoleMasterAlreadyExistOrNot(PKID, roleMaster.roleName,roleMaster.orgModulesId);
         let CodeMsg = roleMaster && roleMaster.roleName ? 'Role  "' + roleMaster.roleName + '" already in use' : 'Role Name already in use';
       if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning(CodeMsg, codes.CODE_ALREADY_EXISTS);
       console.log("req : ", req.user);
@@ -710,6 +709,9 @@ const getOrgRelationTypeMaster = async (req, res) => {
     try {
         let where = [];
         where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.groupId) {
+            where.push(util.constructWheresForSequelize('groupId', req.query.groupId));
+        }
         if (req.query.id) {
             return getOrgRelationTypeMasterById(req, res);
         }
