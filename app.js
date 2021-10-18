@@ -54,10 +54,10 @@ app.use('/api-auth/*/', (req, res, next) => {
 		const url = req.originalUrl;
 		const keys = url.split('/');
 		// let's split
-		console.log("Auth api request(app.js - start middleware)")
+	//	console.log("Auth api request(app.js - start middleware)")
 		const splitter = keys[3].split('?');
-		console.log('darn: ', splitter);
-		console.log('darn 2: ', splitter[0]);
+		//console.log('darn: ', splitter);
+		//console.log('darn 2: ', splitter[0]);
 		
 		if (splitter[0] === 'account' ||
 			splitter[0] === 'otp' ||
@@ -65,7 +65,7 @@ app.use('/api-auth/*/', (req, res, next) => {
 			splitter[0] === 'admin' ||
 			splitter[0] === 'masterCategory' ||
 			splitter[0] === 'masterDetails') {
-			console.log('what an');
+		//	console.log('what an');
 			next();
 		}
 		else {
@@ -77,7 +77,7 @@ app.use('/api-auth/*/', (req, res, next) => {
 });
 
 // rest of the routing goes here, after satisfying the access conditions from middleware
-console.log("routers");
+//console.log("routers");
 app.use('/api-auth/*/user/', usersRouter);
 app.use('/api-auth/*/otp/', otpRouter);
 app.use('/api-auth/*/account/', accountRouter); 

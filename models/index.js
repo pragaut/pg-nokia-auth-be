@@ -47,7 +47,7 @@ db.userRole.belongsTo(db.user, { as: 'user', foreignKey: 'userId'});
 db.user.hasMany(db.userRole , { foreignKey: 'userId' });
 
 db.userRole.belongsTo(db.roleMaster , { as: 'roleMaster', foreignKey: 'roleId'})
-db.roleMaster.hasOne(db.userRole , { as: 'userRoles', foreignKey: 'roleId' });
+//db.roleMaster.hasOne(db.userRole , { as: 'userRoles', foreignKey: 'roleId' });
 
 //db.module.hasOne(db.roleMaster, { foreignKey: 'moduleMasterId' })
 db.yearMaster.belongsTo(db.yearTypeMaster , { as: 'yearType', foreignKey: 'yearTypeMasterId' });

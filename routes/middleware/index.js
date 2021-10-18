@@ -49,13 +49,13 @@ const verifyAccess = (accessLevel, requestType, method) => {
 const entry = async (req, res, next) => {
     try {
         const token = req.body.token || req.query.token || req.headers['authorization'] || req.headers['x-access-token'] ;
-        console.log("User Login Entry")
+        //console.log("User Login Entry")
         const originalUrl = req.originalUrl;
         let keys = req.originalUrl.split('/');
         const requestMethod = req.method;
 
         let defaultKey = '';
-         console.log('key: ', keys);
+      //   console.log('key: ', keys);
 
         switch (requestMethod) {
             case 'POST':
@@ -75,7 +75,7 @@ const entry = async (req, res, next) => {
 
         if (requestMethod === 'PUT') {
             // has to have id because it is an edit field. If not id, then it is for sure an invalid request
-            console.log('req.body: ', req.body);
+            //console.log('req.body: ', req.body);
             // we will send id for a single record, and ids for multiple record update
             if ((typeof req.body.id === 'undefined' || req.body.id === '' ) && (typeof req.body.ids === 'undefined' || req.body.ids === '')) {
                 // invalid request, totally coz we are trying to update 
@@ -136,7 +136,7 @@ const entry = async (req, res, next) => {
                 // id of the user has to be the same, 
                 // same user id, you are saving your own info. Fine with us :)
                 // go ahead with the save
-                console.log("2 0 - : ")
+               // console.log("2 0 - : ")
                 user.saveUser(req, res);
 
                 break;
@@ -154,7 +154,7 @@ const entry = async (req, res, next) => {
 
                         if (util.oprMiddleware(req, res)) {
                             // true means we are good to go coz opr key is found
-                            console.log('opr key found correctly : ', originalUrl);
+                         //   console.log('opr key found correctly : ', originalUrl);
                             next(true);
                             return;
                         }
@@ -164,7 +164,7 @@ const entry = async (req, res, next) => {
                     }
                 }
 
-                 console.log('crazy bhai: ', token );
+                // console.log('crazy bhai: ', token );
 
                 // NOTE: if we couldn't find an opr key for open routes, let's not kill them there, the api
                 // might have sent us the auth token. So let's continue and try to get the request 
@@ -172,38 +172,38 @@ const entry = async (req, res, next) => {
 
                 if (token === config.OPR_KEY) {
                     // oopsie.... the opr key is supplied, and we couldn't find info about the module in open routes, 
-                    console.log("OPR 1");
+                  //  console.log("OPR 1");
                     return responseHelper.unauthorized(res);    
                 }
-                console.log("2");
+               // console.log("2");
                 // here onwards, we will assume that we need the Auth token for processing any request.
 
                 // let's try to see if we have got the token in request
 
                 if (!token) {
-                     console.log("3");
+                   //  console.log("3");
                     return responseHelper.unauthorized(res);
                 }
-                console.log("4");
+                //console.log("4");
                 // let's try to decrypt token
                 const decoded = util.tokenIsValid(token);
                 
-                console.log("5");
+                //console.log("5");
                 if (decoded.isError) {
                     // error in token
-                    console.log("6");
+                    //console.log("6");
                     throw decoded.error;
                 }
-                console.log("7");
+                //console.log("7");
                 if (decoded.userId && decoded.email && decoded.injectedKey) {
                     // valid token
-                    console.log("8");
+                    //console.log("8");
                     // let's make sure the injected key matches
                     if (decoded.injectedKey !== config.INJECTED_KEY) {
-                       console.log("9");
+                       //console.log("9");
                         throw util.generateWarning(`Token corruped`, codes.TOKEN_AUTH_CORRUPTED);
                     }
-                     console.log("9");
+                     //console.log("9");
                     // ok, good token. 
 
                     // Now we have the user id, let's push it to req so it can be used later on
@@ -280,7 +280,7 @@ const entry = async (req, res, next) => {
         }
     }
     catch (error) {
-        console.log('auth error: ', error);
+       // console.log('auth error: ', error);
         responseHelper.error(res, error, error.code ? error.code : codes.ERROR);
     }
 };

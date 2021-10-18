@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const user = require('../controllers/user');
 /* GET users listing. */
-
 router.get('/', function (req, res, next) { user.getUsers(req, res); });
 router.get('/getUsersP', function (req, res, next) { user.getUsersP(req, res); });
 router.get('/getCurrentUserSessionDetails', function (req, res, next) { user.getCurrentUserSessionDetails(req, res); });

@@ -406,7 +406,7 @@ const _findVerifiedUserWithEmail = async (emailToSearch, isActive) => {
 	return user;
 };
 
-const _findUserWithId = async (id) => { 
+const _findUserWithId = async (id) => {
 	// await dal.findById(db.user, id, false); 
 	const where = {
 		//[Op.or]: [{ username: email }],
@@ -443,7 +443,7 @@ const _findUserWithId = async (id) => {
 	//console.log("auth include : ", include);
 	const Result = await dal.findOne(db.user, where, true, include, 2, ['user', 'userRoles', 'roleMaster', 'accessGroup', 'employeeMaster']);
 	//console.log("auth include Result: ", Result);
-	return Result; 
+	return Result;
 };
 
 const _getUsersByEmail = async (nameToSearch) => {
@@ -1018,7 +1018,7 @@ const authenticate = async (req, res) => {
 		}
 		else {
 			// required fields check
-		//	console.log("----------------------------login -------------------------------------");
+			//	console.log("----------------------------login -------------------------------------");
 			if (util.missingRequiredFields('login', req.body, res) === '') user = await _authenticate(req.body.email, req.body.password, req.HostName, req.body.socialauth, req.body.dataPublicIP);
 		}
 		//('recevied from social: ', user);
@@ -1085,7 +1085,7 @@ const authenticate = async (req, res) => {
 		responseHelper.success(res, 200, authPacket, messages.LOGGED_IN_SUCCESSFULLY);
 	}
 	catch (error) {
-	//	console.log('error: ', error);
+		//	console.log('error: ', error);
 		responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'Authentication Error');
 	}
 };
@@ -1640,22 +1640,14 @@ const saveUser = async (req, res) => {
 		let userq = req.body;
 		const userRoles = user.userRoles;
 		if (user.roleMasterIds) delete user.roleMasterIds;
-		//console.log("save user :", user);
 		let CreatedBy = req.user ? req.user.id : undefined;
-		const sendOTP = {
-			mobile: false,
-			email: false,
-		};
-		//console.log("save user 1 ")
-		if (user.mobileConfirmed) delete user.mobileConfirmed;
-		if (user.emailConfirmed) delete user.emailConfirmed;
-		//console.log("save user 2 ")
 		let _user = undefined;
+		console.log("request :", req);
+		console.log("userq :-------------", userq);
 		if (user.id) {
 			delete user.password
 			_user = await _findUserWithId(user.id);
 		}
-		//console.log("save user 3 ")
 		if (_user && _user.id === req.user.id) {
 			const newData = user;
 
@@ -1665,38 +1657,21 @@ const saveUser = async (req, res) => {
 			};
 			//console.log("save user 4 ")
 		}
-		else if (typeof user.id !== 'undefined') {
-			user.emailConfirmed = true;
-			user.mobileConfirmed = true;
-
-			//console.log("save user 5 ")
-		}
 		else {
 			let wheres = null;
-			if (userq.mobile && userq.mobile != 'undefined') {
-				wheres = {
-					active: 1,
-					//email: userq.email,
-					[Op.or]: [{ email: userq.email }, { userName: userq.userName }, { mobile: userq.mobile ? userq.mobile : null }]
-				};
-			}
-			else {
-				wheres = {
-					active: 1,
-					//email: userq.email,
-					[Op.or]: [{ email: userq.email }, { userName: userq.userName }]
-				};
-			}
+
+			wheres = {
+				isActive: 1,
+				employeeId:userq.employeeId ,
+				[Op.or]: [{ username: userq.userName, }]
+			};
 			const include = [{
 				model: db.userRole, as: 'userRoles',
 				where: {
-					active: 1
+					isActive: 1
 				},
 				required: false
 			}];
-			//wheres.push(util.constructWheresForSequelize('active', 1));
-			//wheres.push(util.constructWheresForSequelize('email', userq.email));
-			//console.log("save user 6w ", wheres)
 			const _userWithEmail = await dal.findOne(db.user,
 				wheres,
 				true,
@@ -1704,46 +1679,27 @@ const saveUser = async (req, res) => {
 			);
 			//console.log("save user 6 ", _userWithEmail)
 			if (_userWithEmail) {
-				// return responseHelper.success(res, codes.EMAIL_ALREADY_EXISTS, {
-				// 	id: _userWithEmail.id
-				// }, messages.USER_ALREADY_EXISTS);
-				let MasterName = "email / username / mobile already exist";
+				let MasterName = "username already exist";
 				throw util.generateWarning(MasterName, codes.EMAIL_ALREADY_EXISTS);
 			}
-			else {
-				user.emailConfirmed = true;
-				user.mobileConfirmed = true;
-			}
-			// if (_userWithEmail) {
-			// 	 let EmailAlredyInUse = "email already in use";
-			//  	return responseHelper.error(res,EmailAlredyInUse, codes.EMAIL_ALREADY_EXISTS, {
-			// 		id: _userWithEmail.id
-			// 	}, messages.USER_ALREADY_EXISTS)
-			// }
-			// else {
-			// 	user.emailConfirmed = true;
-			// 	user.mobileConfirmed = true;
-			// }
-			//console.log("save user 7 ")
 		}
-
 		//console.log('saving: ');
 
-		user.originPlatform = user.source;
-		user.active = true;
-		user.mobileConfirmed = true;
-		user.emailConfirmed = true;
-
+		user.isActive = true;
 		// hash the password for security
 		if (!user.id) {
 			const passwordSaltWrapper = encryptionHelper.hashPassword(user.password);
 			user.password = passwordSaltWrapper.password;
-			user.passwordSalt = passwordSaltWrapper.salt;
+			user.saltPassword = passwordSaltWrapper.salt;
 		}
 		user.accessGroupId = process.env.DEFAULT_USER_GROUP;
-
+		let roleMasterId = user && user.userRoles && user.userRoles.length > 0 && user.userRoles[0];
+		let username = user && user.userName;
+		user.roleId = roleMasterId;
+		user.username = username;
 		const userSaveResult = await dal.saveData(db.user, user, undefined, req.user ? req.user.id : -1);
 		//console.log("User userSaveResult Details", userSaveResult)
+		console.log("userSaveResult.id", userSaveResult.id)
 		if (userSaveResult.id) {
 			try {
 				let DataUserroles = await getUserRoleByUserId(userSaveResult.id);
@@ -1751,11 +1707,11 @@ const saveUser = async (req, res) => {
 				if (DataUserroles && DataUserroles.length > 0) {
 					await db.userRole.update(
 						{
-							active: 0
+							isActive: 0
 						},
 						{
 							where: {
-								active: 1,
+								isActive: 1,
 								userId: userSaveResult.id
 							}
 						})
@@ -1763,32 +1719,35 @@ const saveUser = async (req, res) => {
 			}
 			catch (error) {
 			}
-
-			userRoleResult = await saveUserRoles(userSaveResult.id, user.roleMasterIds, userRoles, req.user ? req.user.id : -1);
+			console.log("userSaveResult.id :---------------", userSaveResult.id)
+			console.log("userRoles :----------------", userRoles)
+			userRoleResult = await saveUserRoles(userSaveResult.id, userRoles, req.user ? req.user.id : -1);
 		}
 		responseHelper.success(res, codes.SUCCESS, userSaveResult.id, messages.USER_SAVED, userSaveResult.id, 1);
 	} catch (error) {
-	//	console.log("save user error ")
+		//console.log("save user error ")
 		responseHelper.error(res, error, error.code, 'Updating user error !!');
 	}
 };
 
 const getUserRoleByUserAndRoleId = async (userId, Roles, createdBy) => {
 	try {
+		console.log("userId : -----------", userId)
+		console.log("getUserRoleByUserAndRoleId : -----------", Roles)
+		const where = {
+			userId: userId,
+			roleId: Roles
+		};
 
-		const where = {};
-
-		//	typeof isActive === 'undefined' ? '' : where.active = isActive;
-		//where.active =1;
-		where.userId = userId;
-		where.roleMasterId = Roles;
-
+		//where.userId = userId;
+		//where.roleId = Roles;
+		console.log("where -------------- ", where);
 		const userRoleResult = await dal.findOne(db.userRole, where, true);
-
+		console.log("getUserRoleByUserAndRoleId 1 : -----------", Roles)
 		return userRoleResult;
 	} catch (error) {
 		//responseHelper.error(undefined, error, error.code, 'Updating User role');
-		//("user role log error : ", error);
+		//console.log("user role log error : ", error);
 		return undefined
 	}
 }
@@ -1797,75 +1756,54 @@ const getUserRoleByUserId = async (userId) => {
 	try {
 
 		let where = [];
-		where.push(util.constructWheresForSequelize('active', 1));
+		where.push(util.constructWheresForSequelize('isActive', 1));
 		where.push(util.constructWheresForSequelize('userId', userId));
 
 
 		const userRoleResult = await dal.getList({ model: db.userRole, where: where, order: [['createdAt', 'desc']], include: false });
-		//const userRoleResult = await dal.findOne(db.userRole, where, true);
-
 		return userRoleResult;
 	} catch (error) {
-		//responseHelper.error(undefined, error, error.code, 'Updating User role');
-		//console.log("user role log error : ", error);
+		//	console.log("user role log error : ", error);
 		return undefined
 	}
 }
 
-// const deleteUserRole = (roleId, UserId) => {
-// 	try {
-// 		console.log("delete user role req : ", roleId);
-// 		dal.deleteRecords(db.userRole, roleId, UserId, null);
-// 	}
-// 	catch (error) {
-// 		responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting user role details');
-// 	}
-// };
-
-const saveUserRoles = async (userId, Role, Roles, createdBy) => {
+const saveUserRoles = async (userId, Roles, createdBy) => {
 	try {
 		let userRoleResult = undefined;
-		//console.log("Roles", Roles);
-
+		console.log("Roles :------------", Roles);
 		if (Roles && Roles.length > 0) {
 			for (let element of Roles) {
 				let userRoleExist = await getUserRoleByUserAndRoleId(userId, element);
+				console.log("userRoleExist :", userRoleExist)
 				//console.log("userRoleExist : ", userRoleExist);
 				if (!userRoleExist) {
 					let userRoles = {
 						userId: userId,
-						roleMasterId: element,
-						active: 1
+						roleId: element,
+						isActive: 1,
+						isBlocked:0
 					}
+					console.log("userRoles : --------",userRoles);
 					userRoleResult = await dal.saveData(db.userRole, userRoles, undefined, createdBy);
+					console.log("userRoleResult : --------",userRoleResult);
 				}
 				else if (userRoleExist) {
 					let userRoles = {
 						id: userRoleExist.id,
 						userId: userId,
-						roleMasterId: element,
-						active: 1
+						roleId: element,
+						isActive: 1,
+						isBlocked:0
 					}
 					userRoleResult = await dal.saveData(db.userRole, userRoles, undefined, createdBy);
 				}
 			};
 		}
-		else if (Role) {
-			let userRoleExist = await getUserRoleByUserAndRoleId(userId, Role);
-			//console.log("userRoleExist : ", userRoleExist)
-			if (!userRoleExist) {
-				const userRoles = {
-					userId: userId,
-					roleMasterId: Role,
-					active: 1
-				}
-				userRoleResult = await dal.saveData(db.userRole, userRoles, undefined, createdBy);
-			}
-		}
 		return userRoleResult;
 	} catch (error) {
 		//responseHelper.error(undefined, error, error.code, 'Updating User role');
-		//console.log("user role log error : ", error);
+		//	console.log("user role log error : ", error);
 		return undefined
 	}
 }
@@ -1876,6 +1814,7 @@ const deleteUser = async (req, res) => {
 		if (!req.query.id) {
 			throw util.generateWarning(`Please provide user id`, codes.ID_NOT_FOUND);
 		}
+		console.log("req.query.id : *********",req.query.id);
 		dal.deleteRecords(db.user, req.query.id, req.user.id, res);
 	}
 	catch (error) {
@@ -2157,13 +2096,10 @@ const getUsers = async (req, res) => {
 
 const getUsersP = async (req, res) => {
 	try {
-		//console.log("Get getUsersP req.query : ", req.query);
-		db.sequelize.query('call Asp_UserDetails_Get_UserDetails(:userId, :companyMasterId, :plantMasterId, :departmentMasterId, :roleMasterId)', {
+		console.log("Get getUsersP req.query : ", req.query);
+		db.sequelize.query('call asp_user_details_get_user_details(:userId, :roleMasterId)', {
 			replacements: {
 				userId: req.query.userId ? req.query.userId : '',
-				companyMasterId: req.query.companyMasterId ? req.query.companyMasterId : '',
-				plantMasterId: req.query.plantMasterId ? req.query.plantMasterId : '',
-				departmentMasterId: req.query.departmentMasterId ? req.query.departmentMasterId : '',
 				roleMasterId: req.query.roleMasterId ? req.query.roleMasterId : ''
 			}
 		}).then(results => {

@@ -1564,7 +1564,7 @@ const getOrganisationEmployeeDetails = async (req, res) => {
                 {
                     replacements: {
                         p_employee_id: req.query.id ? req.query.id : '',
-                        p_org_details_id: req.query.p_org_details_id ? req.query.p_org_details_id : ''
+                        p_org_details_id: req.query.orgDetailsId ? req.query.orgDetailsId : ''
                     }
                 }).then(results => {
                     responseHelper.success(res, 200, results, 'Organisation Employee Details List got successfully', '-1', results.length);
@@ -1572,6 +1572,7 @@ const getOrganisationEmployeeDetails = async (req, res) => {
                     responseHelper.error(res, err.code ? err.code : codes.ERROR, err, 'Error in Organisation Employee Details');
                 });
         }
+        console.log("req.query : Org Employee ++++++++++=", req.query)
     }
     catch (error) {
         responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Organisation Employee Details');
@@ -1609,6 +1610,195 @@ const deleteOrganisationEmployeeDetails = async (req, res) => {
 };
 //#endregion
 
+//#region User Details Master
+
+// const saveUser = async (req, res) => {
+// 	try {
+// 		let user = req.body;
+// 		let userq = req.body;
+// 		const userRoles = user.userRoles;
+// 		if (user.roleMasterIds) delete user.roleMasterIds;
+// 		let CreatedBy = req.user ? req.user.id : undefined;	
+// 		let _user = undefined;
+
+// 		if (user.id) {
+// 			delete user.password
+// 			_user = await _findUserWithId(user.id);
+// 		}
+// 		if (_user && _user.id === req.user.id) {
+// 			const newData = user;
+
+// 			user = {
+// 				..._user.dataValues,
+// 				...newData
+// 			};
+// 			//console.log("save user 4 ")
+// 		}
+// 		else {
+// 			let wheres = null;
+			
+// 				wheres = {
+// 					active: 1,
+// 					//email: userq.email,
+// 					[Op.or]: [{ userName: userq.userName }]
+// 				};
+// 			const include = [{
+// 				model: db.userRole, as: 'userRoles',
+// 				where: {
+// 					active: 1
+// 				},
+// 				required: false
+// 			}];
+// 			const _userWithEmail = await dal.findOne(db.user,
+// 				wheres,
+// 				true,
+// 				include
+// 			);
+// 			console.log("save user 6 ", _userWithEmail)
+// 			if (_userWithEmail) {			
+// 				let MasterName = "username already exist";
+// 				throw util.generateWarning(MasterName, codes.EMAIL_ALREADY_EXISTS);
+// 			}
+// 		}
+// 		console.log('saving: ');
+
+// 		user.active = true;
+
+// 		// hash the password for security
+// 		if (!user.id) {
+// 			const passwordSaltWrapper = encryptionHelper.hashPassword(user.password);
+// 			user.password = passwordSaltWrapper.password;
+// 			user.passwordSalt = passwordSaltWrapper.salt;
+// 		}
+// 		user.accessGroupId = process.env.DEFAULT_USER_GROUP;
+
+// 		const userSaveResult = await dal.saveData(db.user, user, undefined, req.user ? req.user.id : -1);
+// 		//console.log("User userSaveResult Details", userSaveResult)
+// 		if (userSaveResult.id) {
+// 			try {
+// 				let DataUserroles = await getUserRoleByUserId(userSaveResult.id);
+// 				//console.log("User Role Details", DataUserroles)
+// 				if (DataUserroles && DataUserroles.length > 0) {
+// 					await db.userRole.update(
+// 						{
+// 							active: 0
+// 						},
+// 						{
+// 							where: {
+// 								active: 1,
+// 								userId: userSaveResult.id
+// 							}
+// 						})
+// 				}
+// 			}
+// 			catch (error) {
+// 			}
+
+// 			userRoleResult = await saveUserRoles(userSaveResult.id, user.roleMasterIds, userRoles, req.user ? req.user.id : -1);
+// 		}
+// 		responseHelper.success(res, codes.SUCCESS, userSaveResult.id, messages.USER_SAVED, userSaveResult.id, 1);
+// 	} catch (error) {
+// 		console.log("save user error ")
+// 		responseHelper.error(res, error, error.code, 'Updating user error !!');
+// 	}
+// };
+
+// const getUserRoleByUserAndRoleId = async (userId, Roles, createdBy) => {
+// 	try {
+
+// 		const where = {};
+
+// 		where.userId = userId;
+// 		where.roleMasterId = Roles;
+
+// 		const userRoleResult = await dal.findOne(db.userRole, where, true);
+
+// 		return userRoleResult;
+// 	} catch (error) {
+// 		//responseHelper.error(undefined, error, error.code, 'Updating User role');
+// 		console.log("user role log error : ", error);
+// 		return undefined
+// 	}
+// }
+
+// const getUserRoleByUserId = async (userId) => {
+// 	try {
+
+// 		let where = [];
+// 		where.push(util.constructWheresForSequelize('active', 1));
+// 		where.push(util.constructWheresForSequelize('userId', userId));
+
+
+// 		const userRoleResult = await dal.getList({ model: db.userRole, where: where, order: [['createdAt', 'desc']], include: false });
+// 		return userRoleResult;
+// 	} catch (error) {
+// 		console.log("user role log error : ", error);
+// 		return undefined
+// 	}
+// }
+
+// const saveUserRoles = async (userId, Role, Roles, createdBy) => {
+// 	try {
+// 		let userRoleResult = undefined;
+
+// 		if (Roles && Roles.length > 0) {
+// 			for (let element of Roles) {
+// 				let userRoleExist = await getUserRoleByUserAndRoleId(userId, element);
+// 				//console.log("userRoleExist : ", userRoleExist);
+// 				if (!userRoleExist) {
+// 					let userRoles = {
+// 						userId: userId,
+// 						roleMasterId: element,
+// 						active: 1
+// 					}
+// 					userRoleResult = await dal.saveData(db.userRole, userRoles, undefined, createdBy);
+// 				}
+// 				else if (userRoleExist) {
+// 					let userRoles = {
+// 						id: userRoleExist.id,
+// 						userId: userId,
+// 						roleMasterId: element,
+// 						active: 1
+// 					}
+// 					userRoleResult = await dal.saveData(db.userRole, userRoles, undefined, createdBy);
+// 				}
+// 			};
+// 		}
+// 		else if (Role) {
+// 			let userRoleExist = await getUserRoleByUserAndRoleId(userId, Role);
+// 			//console.log("userRoleExist : ", userRoleExist)
+// 			if (!userRoleExist) {
+// 				const userRoles = {
+// 					userId: userId,
+// 					roleMasterId: Role,
+// 					active: 1
+// 				}
+// 				userRoleResult = await dal.saveData(db.userRole, userRoles, undefined, createdBy);
+// 			}
+// 		}
+// 		return userRoleResult;
+// 	} catch (error) {
+// 		//responseHelper.error(undefined, error, error.code, 'Updating User role');
+// 		console.log("user role log error : ", error);
+// 		return undefined
+// 	}
+// }
+
+// const deleteUser = async (req, res) => {
+// 	try {
+// 		//console.log("delete user req : ", req);
+// 		if (!req.query.id) {
+// 			throw util.generateWarning(`Please provide user id`, codes.ID_NOT_FOUND);
+// 		}
+// 		dal.deleteRecords(db.user, req.query.id, req.user.id, res);
+// 	}
+// 	catch (error) {
+// 		responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting user details');
+// 	}
+// };
+
+//#endregion
+
 module.exports.saveorgRelationTypeMaster = saveorgRelationTypeMaster;
 module.exports.deleteOrgRelationTypeMaster = deleteOrgRelationTypeMaster;
 module.exports.getOrgRelationTypeMaster = getOrgRelationTypeMaster;
@@ -1635,7 +1825,6 @@ module.exports.getYearMasterById = getYearMasterById;
 module.exports.saveRoleMaster = saveRoleMaster;
 module.exports.deleteRoleMaster = deleteRoleMaster;
 module.exports.getRoleMaster = getRoleMaster;
-module.exports.getRoleMasterByModuleId = getRoleMasterByModuleId;
 
 module.exports.saveCompanyMaster = saveCompanyMaster;
 module.exports.deleteCompanyMaster = deleteCompanyMaster;
