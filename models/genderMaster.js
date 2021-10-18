@@ -13,7 +13,23 @@ module.exports = function (sequelize, DataTypes){
         isActive : {
             type: DataTypes.BOOLEAN,
             field:'is_active'
-        }
+        },
+        createdBy: {
+			type : DataTypes.STRING,
+			field : 'created_by'
+		},
+		createdAt: {
+			type: DataTypes.DATE,
+			field: 'created_on',
+		  },
+		modifiedBy: {
+			type : DataTypes.STRING,
+			field : 'modified_by'
+		},
+		updatedAt: {
+			type: DataTypes.DATE,
+			field: 'modified_on'
+		  }
     },
     {
         tableName: 'tbl_cm_genders',

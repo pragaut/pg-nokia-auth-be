@@ -1277,7 +1277,6 @@ const getStatusMaster = async (req, res) => {
 };
 //#endregion
 
-
 //#region  Country  Master  
 const getCountryMasterById = async (req, res) => {
     try {
@@ -1427,6 +1426,7 @@ const getGenderMaster = async (req, res) => {
 //#endregion
 
 //#region  Organisation Details Master  
+
 const getOrganisationDetailsById = async (req, res) => {
     try {
         const result = await dal.findById(db.organisationDetails, req.query.id);
@@ -1531,6 +1531,99 @@ const deleteOrganisationDetails = async (req, res) => {
 };
 //#endregion
 
+//#region Organisation Employee Master
+const getOrganisationEmployeeDetailsById = async (req, res) => {
+    try {
+        const result = await dal.findById(db.organisationEmployeeMaster, req.query.id);
+
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting organisation employee details');
+    }
+};
+const _findOrganisationEmployeeDetailsId = async (orgDetailsId,employeeName,employeeCode,isActive, id) => {
+    let where = [];
+    if (id && id !== null && id !== 'undefined') {
+        where.push(util.constructWheresForNotEqualSequelize('id', id));
+    }
+    where.push(util.constructWheresForSequelize('isActive', 1));
+    if(orgDetailsId)
+    {
+        where.push(util.constructWheresForSequelize('orgDetailsId', orgDetailsId));
+    }
+    if(employeeName)
+    {
+        where.push(util.constructWheresForSequelize('employeeName', employeeName));
+    }
+    if(employeeCode)
+    {
+        where.push(util.constructWheresForSequelize('employeeCode', employeeCode));
+    }
+    const OrganisationEmployeeDetails = await dal.getList({ model: db.organisationEmployeeMaster, where, order: [['createdAt', 'desc']], include: false, });
+    if (OrganisationEmployeeDetails && OrganisationEmployeeDetails.length > 0) {
+        return 'already exist'
+    }
+    else {
+        return 'success'
+    }
+};
+const getOrganisationEmployeeDetails = async (req, res) => {
+    try {
+        let where = [];
+        where.push(util.constructWheresForSequelize('isActive', 1));
+        if (req.query.id) {
+            return getOrganisationEmployeeDetailsById(req, res);
+        }
+        else {
+            db.sequelize.query('call asp_nk_cm_org_employee_details_get_org_employee_details(:p_employee_id, :p_org_details_id)',
+                {
+                    replacements: {
+                        p_employee_id: req.query.id ? req.query.id : '',
+                        p_org_details_id: req.query.p_org_details_id ? req.query.p_org_details_id : ''
+                    }
+                }).then(results => {
+                    responseHelper.success(res, 200, results, 'Organisation Employee Details List got successfully', '-1', results.length);
+                }).catch(err => {
+                    responseHelper.error(res, err.code ? err.code : codes.ERROR, err, 'Error in Organisation Employee Details');
+                });
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting Organisation Employee Details');
+    }
+};
+const saveOrganisationEmployeeDetails = async (req, res) => {
+    try {
+        const OrganisationEmployeeDetails = req.body;
+        let PKID = OrganisationEmployeeDetails && OrganisationEmployeeDetails.id ? OrganisationEmployeeDetails.id : undefined;
+        const ChekAlreadyExist = await _findOrganisationEmployeeDetailsId(OrganisationEmployeeDetails.orgDetailsId,OrganisationEmployeeDetails.employeeName, OrganisationEmployeeDetails.employeeCode, true, PKID)
+        if (ChekAlreadyExist && ChekAlreadyExist !== "success") throw util.generateWarning('Employee Details  already in use', codes.CODE_ALREADY_EXISTS);
+
+        if (util.missingRequiredFields('OrganisationEmployeeDetails :', OrganisationEmployeeDetails, res) === '') {
+            await dal.saveData(db.organisationEmployeeMaster, OrganisationEmployeeDetails, res, req.user.id);
+        }
+        else {
+            console.log("Backend organisation Employee Details Data else condition", req)
+        }
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'saving organisation Employee Details');
+    }
+};
+const deleteOrganisationEmployeeDetails = async (req, res) => {
+    try {
+        //console.log("delete Due Day req : ", req);
+        if (!req.query.id) {
+            throw util.generateWarning(`Please provide organisation Employee id`, codes.ID_NOT_FOUND);
+        }
+        dal.deleteRecords(db.organisationEmployeeMaster, req.query.id, req.user.id, res);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'deleting organisation Employee Details');
+    }
+};
+//#endregion
 
 module.exports.saveorgRelationTypeMaster = saveorgRelationTypeMaster;
 module.exports.deleteOrgRelationTypeMaster = deleteOrgRelationTypeMaster;
@@ -1564,7 +1657,6 @@ module.exports.deleteCompanyMaster = deleteCompanyMaster;
 module.exports.getCompanyMaster = getCompanyMaster;
 module.exports.getCompanyMasterByGroupMasterId = getCompanyMasterByGroupMasterId;
 
-
 module.exports.saveplantMaster = saveplantMaster;
 module.exports.deleteplantMaster = deleteplantMaster;
 module.exports.getplantMaster = getplantMaster;
@@ -1587,3 +1679,7 @@ module.exports.getGenderMaster = getGenderMaster;
 module.exports.getOrganisationDetails = getOrganisationDetails;
 module.exports.saveOrganisationDetails = saveOrganisationDetails;
 module.exports.deleteOrganisationDetails = deleteOrganisationDetails;
+
+module.exports.getOrganisationEmployeeDetails = getOrganisationEmployeeDetails;
+module.exports.saveOrganisationEmployeeDetails = saveOrganisationEmployeeDetails;
+module.exports.deleteOrganisationEmployeeDetails = deleteOrganisationEmployeeDetails;
