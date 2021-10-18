@@ -16,7 +16,8 @@ module.exports = function (sequelize, DataTypes) {
         orgDetailsParentId :{
             type : DataTypes.STRING,
             field : 'org_details_parent_id'
-        },orgName :{
+        },
+        orgName :{
             type : DataTypes.STRING,
             field : 'org_name'
         },

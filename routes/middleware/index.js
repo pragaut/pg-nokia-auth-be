@@ -122,8 +122,8 @@ const entry = async (req, res, next) => {
         let moduleName =  (keys.length === 6 && keys[4] !== '') ? (keys[3].toLowerCase() +'-'+keys[4].toLowerCase()) : keys[3].toLowerCase();
         let requestType = keys[keys.length - 1].toLowerCase();
 
-        //console.log('module 12: ', moduleName);
-        //console.log('keys: ', keys);
+        console.log('module 12: ', moduleName);
+        console.log('keys: ', keys);
 
 
         let openRoute = false;
@@ -214,7 +214,7 @@ const entry = async (req, res, next) => {
                         firstName: decoded.firstName,
                         lastName: decoded.lastName
                     };
-                  //  console.log("10");
+                   console.log("10");
 
                     // since the token is valid, so we can just return if the request is an open route request
 
@@ -225,7 +225,7 @@ const entry = async (req, res, next) => {
 
                     // let's try if the logged user has access to the module and the requested method
 
-                    //console.log("10");
+                    console.log("10 A",req.user);
                     const _user = await user._findUserWithId(decoded.userId);
                    // console.log("11",_user);
                     if (!_user) {
@@ -238,31 +238,31 @@ const entry = async (req, res, next) => {
                     // check if the user is admin or not
                     if (_user && _user.accessGroup && _user.accessGroup.name === config.SUPER_ADMIN) {
                         // ok, this guy has access to everything. Just send him the access
-                      //  console.log("13");
+                        console.log("13");
                         return next(true);
                     }
 
                     // since user is not admin, we will check if the user belongs to a group which has access to this module
-                   // console.log("14");
+                    console.log("14");
                     if (_user.accessGroup) {
                         // let's find the info
-                     //   console.log("15");
+                      console.log("15");
                         const _groupAccess = await groupAccess.findGroupAccessToModule(_user.accessGroup.id, moduleName);
 
                         if (_groupAccess) {
                             // ok, we were able to find the access to the group
-                           // console.log("16");
+                            console.log("16");
                             // now we need to find if the access satisfies the request as well
                             if (verifyAccess(_groupAccess.access, requestType, requestMethod)) return next(true);
                         }
                     }
 
                     // if we have come here, it means that we still couldn't find if we have access to that
-                   // console.log("17");
+                    console.log("17");
                     const _userAccess = await userAccess.findUserAccessToModule(_user.id, moduleName);
 
                     if (_userAccess) {
-                      // console.log("18");
+                       console.log("18");
                         const access = verifyAccess(_userAccess.access, requestType, requestMethod);
 
                         if (access) return next(true);

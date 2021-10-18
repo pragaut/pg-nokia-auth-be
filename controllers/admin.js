@@ -563,6 +563,21 @@ const getRoleMasterById = async (req, res) => {
 * 
 * by defaut gives last one month data.
 */
+const getRoleMasterByModuleId = async (req, res) => {
+    try {
+        const where = {};
+        typeof isActive === 'undefined' ? '' : where.active = isActive;
+        where.orgModulesId = req.query.orgModulesId;
+
+        const result = await dal.findOne(db.roleMaster, where, true);
+
+        responseHelper.success(res, codes.SUCCESS, result);
+    }
+    catch (error) {
+        responseHelper.error(res, error, error.code ? error.code : codes.ERROR, 'getting role master data');
+    }
+};
+
 const getRoleMaster = async (req, res) => {
     try {
         let where = [];
@@ -1314,6 +1329,7 @@ const getStateMasterById = async (req, res) => {
 * 
 * by defaut gives last one month data.
 */
+
 const getStateMaster = async (req, res) => {
     try {
         let where = [];
@@ -1820,7 +1836,6 @@ module.exports.deleteModuleMaster = deleteModuleMaster;
 module.exports.getModuleMaster = getModuleMaster;
 
 module.exports.getYearMaster = getYearMaster;
-module.exports.getYearMasterById = getYearMasterById;
 
 module.exports.saveRoleMaster = saveRoleMaster;
 module.exports.deleteRoleMaster = deleteRoleMaster;
