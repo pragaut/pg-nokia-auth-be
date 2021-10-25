@@ -80,8 +80,6 @@ const _FindGroupMasterAlreadyExistOrNot = async (id, Code) => {
 const saveGroupMaster = async (req, res) => {
     try {
         const groupMaster = req.body;
-
-
         console.log("Group Master : ", groupMaster);
         const PKID = groupMaster && groupMaster.id ? groupMaster.id : undefined;
         const ChekAlreadyExist = await _FindGroupMasterAlreadyExistOrNot(PKID, groupMaster.groupCode);
@@ -96,9 +94,18 @@ const saveGroupMaster = async (req, res) => {
             else
                 groupMaster.groupOrder = 1;
         }
+        let groupCode = '';
+        if(groupMaster && groupMaster.groupCode && groupMaster.groupCode !==null)
+        {
+            groupMaster.groupCode = groupMaster.groupCode.replace(' ','_');
+        }
+        else
+        {
+            groupMaster.groupCode = groupMaster.groupName.replace(' ','_');
+        }
         console.log("req : ", req.user);
         if (req.user && req.user.id !== null)
-            UserId = req.user.id;
+            UserId = req.user.id; 
         //-----let primaryKey = 'group_id';
         if (util.missingRequiredFields('groupMaster', groupMaster, res) === '') {
             //----- await dal.saveData(db.groupMaster, groupMaster, res, UserId, undefined, undefined, undefined, primaryKey);

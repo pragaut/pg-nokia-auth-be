@@ -3,11 +3,11 @@ module.exports = function (sequelize, DataTypes) {
 		id: {
 			type: DataTypes.STRING,
 			primaryKey: true,
-			field : 'org_modules_id'
+			field : 'grp_modules_id'
 		},
-		orgDetailsId: {
+		grpDetailsId: {
 			type : DataTypes.STRING,
-			field : 'org_details_id'
+			field : 'grp_details_id'
 		},
 		moduleName: {
 			type : DataTypes.STRING,
