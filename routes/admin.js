@@ -81,18 +81,25 @@ router.get('/cityMaster', (req, res) => admin.getCityMaster(req, res));
 router.get('/genderMaster', (req, res) => admin.getGenderMaster(req, res));
 //#endregion
 
-//#region Gender Master
+//#region Organisation Details
 router.get('/organisationDetails', (req, res) => admin.getOrganisationDetails(req, res));
 router.put('/organisationDetails', (req, res) => admin.saveOrganisationDetails(req, res));
 router.post('/organisationDetails', (req, res) => admin.saveOrganisationDetails(req, res));
 router.delete('/organisationDetails', (req, res) => admin.deleteOrganisationDetails(req, res));
 //#endregion
 
-//#region Gender Master
+//#region Organisation Employee Details
 router.get('/organisationEmployeeDetails', (req, res) => admin.getOrganisationEmployeeDetails(req, res));
 router.put('/organisationEmployeeDetails', (req, res) => admin.saveOrganisationEmployeeDetails(req, res));
 router.post('/organisationEmployeeDetails', (req, res) => admin.saveOrganisationEmployeeDetails(req, res));
 router.delete('/organisationEmployeeDetails', (req, res) => admin.deleteOrganisationEmployeeDetails(req, res));
+//#endregion
+
+//#region Organisation Module Details
+
+router.get('/organisationGroupModuleDetails', (req, res) => admin.getOrganisationGroupModuleDetails(req, res));
+router.post('/organisationGroupModuleDetails', (req, res) => admin.saveOrganisationGroupModuleDetails(req, res));
+
 //#endregion
 
 

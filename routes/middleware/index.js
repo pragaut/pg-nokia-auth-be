@@ -98,7 +98,7 @@ const entry = async (req, res, next) => {
 
         const appName = keys[2].toLowerCase();
 
-        if (appName === 'tmc') {
+        if (appName === 'nokia') {
                 req.app = appName;
                 req.appName = appName;
         }

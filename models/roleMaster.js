@@ -5,9 +5,9 @@ module.exports = function (sequelize, DataTypes) {
 			primaryKey: true,
 			field :'role_id'
 		}, 
-		orgModulesId: {
+		grpModulesId: {
 			type : DataTypes.STRING,
-			field : 'org_modules_id'
+			field : 'grp_modules_id'
 		},
 		roleName: {
 			type : DataTypes.STRING,

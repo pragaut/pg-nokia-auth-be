@@ -39,7 +39,7 @@ module.exports = function (sequelize, DataTypes) {
 		  }
 	},
 		{
-			tableName: 'tbl_nk_cm_org_modules',
+			tableName: 'tbl_nk_cm_grp_modules',
 			classMethods: {
 				associate: function (Models) {
 					// associations can be defined here
