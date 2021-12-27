@@ -567,7 +567,7 @@ const getRoleMaster = async (req, res) => {
             return getRoleMasterById(req, res);
         }
         else {
-            await dal.getList({ model: db.roleMaster, where, order: [['createdAt', 'desc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
+            await dal.getList({ model: db.roleMaster, where, order: [['roleOrder', 'Asc']], include: true, rowsToReturn: req.query.rows, pageIndex: req.query.pageIndex, res });
         }
     }
     catch (error) {

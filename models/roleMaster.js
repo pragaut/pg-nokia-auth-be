@@ -21,6 +21,10 @@ module.exports = function (sequelize, DataTypes) {
 			type : DataTypes.STRING,
 			field : 'dashboard_url'
 		},
+		isMappingWithDeviceRequired: {
+			type : DataTypes.BOOLEAN,
+			field : 'is_mapping_with_device_required'
+		},
 		isActive: {
 			type : DataTypes.BOOLEAN,
 			field : 'is_active'
