@@ -1075,6 +1075,7 @@ const authenticate = async (req, res) => {
 				id: user.id,
 				employeeName: user.employeeMaster.employeeName,
 				employeeId:  user.employeeMaster.id,
+				orgDetailsId : user.employeeMaster.orgDetailsId,
 				userName : user.username,
 				email: user.employeeMaster.email,
 				mobile: user.employeeMaster.mobile,

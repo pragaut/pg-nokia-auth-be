@@ -1459,13 +1459,14 @@ const getOrganisationDetails = async (req, res) => {
             return getOrganisationDetailsById(req, res);
         }
         else {
-            db.sequelize.query('call asp_nk_cm_org_details_get_org_details(:p_org_details_id, :p_org_relation_type_id, :p_group_id, :p_org_details_parent_id)',
+            db.sequelize.query('call asp_nk_cm_org_details_get_org_details(:p_org_details_id, :p_org_relation_type_id, :p_group_id, :p_org_details_parent_id,:p_org_relation_type)',
                 {
                     replacements: {
                         p_org_details_id: req.query.id ? req.query.id : '',
                         p_org_relation_type_id: req.query.orgRelationTypeId ? req.query.orgRelationTypeId : '',
                         p_group_id: req.query.groupId ? req.query.groupId : '',
                         p_org_details_parent_id: req.query.orgDetailsParentId ? req.query.orgDetailsParentId : '',
+                        p_org_relation_type :  req.query.orgRelationType ? req.query.orgRelationType : ''
                     }
                 }).then(results => {
                     responseHelper.success(res, 200, results, 'Organisation Details List got successfully', '-1', results.length);
