@@ -21,6 +21,14 @@ module.exports = function (sequelize, DataTypes) {
 			type : DataTypes.STRING,
 			field : 'alarm_type_id'
 		},
+		message: {
+			type : DataTypes.STRING,
+			field : 'message'
+		},
+		title: {
+			type : DataTypes.STRING,
+			field : 'title'
+		},
 		isActive: {
 			type : DataTypes.BOOLEAN,
 			field : 'is_active'
